@@ -2,6 +2,6 @@
 </script>
 
 <template>
-  首页
+  另一页
 </template>
 
