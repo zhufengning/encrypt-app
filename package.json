@@ -19,6 +19,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
+    "bn.js": "^5.2.1",
     "vue-router": "^4.2.5",
     "vuetify": "^3.4.2"
   },
