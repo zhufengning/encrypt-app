@@ -1,6 +1,11 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 var value = ref(0)
+const router = useRouter()
+function jmp(s) {
+  router.push(s);
+}
 </script>
 
 <template>
@@ -8,17 +13,17 @@ var value = ref(0)
 
     <v-layout class="overflow-visible" style="height: 56px;">
         <v-bottom-navigation v-model="value" active color="primary">
-            <v-btn @click="this.$router.push('/1');">
+            <v-btn @click="jmp('/1');">
                 <v-icon>mdi-history</v-icon>
                 经典密码
             </v-btn>
 
-            <v-btn @click="this.$router.push('/2');">
+            <v-btn @click="jmp('/2');">
                 <v-icon>mdi-heart</v-icon>
                 现代密码
             </v-btn>
 
-            <v-btn @click="this.$router.push('/3');">
+            <v-btn @click="jmp('/3');">
                 <v-icon>mdi-map-marker</v-icon>
                 联机模式
             </v-btn>
