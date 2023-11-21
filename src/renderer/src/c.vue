@@ -2,6 +2,6 @@
 </script>
 
 <template>
-  首页
+    联机模式
 </template>
 

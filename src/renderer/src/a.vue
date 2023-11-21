@@ -2,6 +2,6 @@
 </script>
 
 <template>
-  另一页
+  经典密码
 </template>
 

@@ -6,21 +6,19 @@ var value = ref(0)
 <template>
     <router-view></router-view>
 
-
     <v-layout class="overflow-visible" style="height: 56px;">
         <v-bottom-navigation v-model="value" active color="primary">
-            <v-btn @click="this.$router.push('/');">
+            <v-btn @click="this.$router.push('/1');">
                 <v-icon>mdi-history</v-icon>
                 经典密码
             </v-btn>
 
-            <v-btn @click="this.$router.push('/about');">
+            <v-btn @click="this.$router.push('/2');">
                 <v-icon>mdi-heart</v-icon>
-
                 现代密码
             </v-btn>
 
-            <v-btn>
+            <v-btn @click="this.$router.push('/3');">
                 <v-icon>mdi-map-marker</v-icon>
                 联机模式
             </v-btn>
