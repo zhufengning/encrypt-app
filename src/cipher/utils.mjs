@@ -57,6 +57,12 @@ export function millerRabin(p, n) {
   if (p.lte(zero)) {
     return false;
   }
+  if (p.eq(one)) {
+    return false;
+  }
+  if (p.eq(new BN("3"))) {
+    return true;
+  }
   if (p.isEven()) {
     if (p.eq(two)) {
       return true;
@@ -64,24 +70,25 @@ export function millerRabin(p, n) {
       return false;
     }
   }
-  if (p.eq(one)) {
-    return false;
-  }
 
   let d = p.sub(one);
   let r = one.clone();
-  while (d.mod(two) == 0) {
-    d.idiv(two);
-    r.add(one);
+  while (d.mod(two).eq(zero)) {
+    // console.log(d.toString())
+    d = d.div(two);
+    r.iadd(one);
   }
+  // console.log("r:", r.toString(), "d:", d.toString())
   let flag = true;
   let ri = p.sub(two);
   for (let i = 0; i < n; i++) {
+    // console.log("Round:", i)
     let a;
     do {
       a = getRandomBN(ri.byteLength())
     }
     while (!(a.gte(two) && a.lte(ri)));
+    // console.log(a.toString())
     var red = BN.mont(p);
     var redA = a.toRed(red);
     let redX = redA.redPow(d);
@@ -112,5 +119,106 @@ export function millerRabin(p, n) {
  * @returns {BN} BN.js的大数字
  */
 export function getRandomPrime(len_byte) {
-  // TODO
+  let r;
+  do {
+    r = getRandomBN(len_byte);
+    let ra = r.toArray(Uint8Array, "be");
+  } while (!millerRabin(r, 10));
+  return r;
+}
+
+/**
+ *
+ * @param {string} hexString
+ * @returns {Uint8Array}
+ */
+export function hexString2U8Array(hexString) {
+  if (hexString.length % 2 != 0) {
+    hexString = "0" + hexString
+  }
+  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+}
+
+
+/**
+ *
+ * @param {Uint8Arraystring} bytes
+ * @returns {string}
+ */
+export function U8Array2hexString(bytes) {
+  return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
+}
+
+/**
+ *
+ * @param {Uint8Array} array
+ * @param {number} maxLength
+ * @returns
+ */
+export function splitUInt8Array(array, maxLength) {
+  let result = [];
+  for (let i = 0; i < array.length; i += maxLength) {
+    result.push(array.slice(i, i + maxLength));
+  }
+  return result;
+}
+
+export function saveArrayBufferAsFile(arrayBuffer, fileName) {
+  // 创建一个新的Blob对象，使用ArrayBuffer数据
+  const blob = new Blob([arrayBuffer]);
+
+  // 创建一个链接元素
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = fileName;
+
+  // 将链接添加到DOM并触发点击事件来开始下载
+  document.body.appendChild(link);
+  link.click();
+
+  // 清理DOM并释放Blob URL
+  document.body.removeChild(link);
+  URL.revokeObjectURL(link.href);
+}
+
+export function padIfOdd(str) {
+  if (str.length % 2 !== 0) {
+    str = "0" + str;
+  }
+  return str;
+}
+
+export function padArrayWithZeros(originalArray, targetLength) {
+  // 检查原数组长度是否已经满足目标长度
+  if (originalArray.length >= targetLength) {
+    return originalArray;
+  }
+
+  // 创建一个新的数组，长度为目标长度，预填充为0
+  let paddedArray = new Uint8Array(targetLength);
+
+  // 计算需要填充0的数量
+  let zerosToFill = targetLength - originalArray.length;
+
+  // 将原数组的内容复制到新数组的指定位置
+  paddedArray.set(originalArray, zerosToFill);
+
+  return paddedArray;
+}
+
+export function concatenateUint8Arrays(arrays) {
+  // 计算所有Uint8Arrays的总长度
+  let totalLength = arrays.reduce((acc, value) => acc + value.length, 0);
+
+  // 创建一个新的Uint8Array来存储所有数据
+  let result = new Uint8Array(totalLength);
+
+  // 将每个数组复制到result中
+  let offset = 0;
+  arrays.forEach(array => {
+    result.set(array, offset);
+    offset += array.length;
+  });
+
+  return result;
 }
