@@ -1,6 +1,4 @@
-import { unit32Arr2Buffer, buffer2Uint32Arr } from "./utils.mjs";
-
-function md5Calculate(arrayBuffer) {
+export function md5Calculate(arrayBuffer) {
     
     function rotateLeft(x, n) {
         return (x << n) | (x >>> (32 - n));
@@ -60,10 +58,8 @@ function md5Calculate(arrayBuffer) {
     let c = 0x98badcfe;
     let d = 0x10325476;
 
-    console.log(arrayBuffer);
+    const words = new Uint32Array(padding(arrayBuffer));
 
-    const words = buffer2Uint32Arr(padding(arrayBuffer));
-    console.log(words);
     for (let i = 0; i < words.length; i += 16) {
         const aa = a;
         const bb = b;
@@ -151,7 +147,7 @@ function md5Calculate(arrayBuffer) {
     // 将结果变量合并到 Uint32Array 中
     const resultWords = new Uint32Array([a, b, c, d]);
 
-    return unit32Arr2Buffer(resultWords);
+    return resultWords.buffer;
 }
 
 // const inputArrayBuffer = new TextEncoder().encode('Hello').buffer;

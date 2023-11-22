@@ -114,34 +114,3 @@ export function millerRabin(p, n) {
 export function getRandomPrime(len_byte) {
   // TODO
 }
-
-
-/**
- * 
- * @param {ArrayBuffer} words 
- * @returns {Uint32Array}
- */
-export function buffer2Uint32Arr(buf) {
-  const len = buf.byteLength / 4;
-  const words = new Uint32Array(len);
-  const view = new DataView(buf);
-  for (let i = 0; i < len; i++) {
-    words[i] = view.getUint32(i * 4, true);
-  }
-  return words;
-}
-
-/**
- * 
- * @param {Uint32Array} buf 
- * @returns {ArrayBuffer}
- */
-export function unit32Arr2Buffer(words) {
-  const len = words.length * 4;
-  const buf = new ArrayBuffer(len);
-  const view = new DataView(buf);
-  for (let i = 0; i < len; i += 4) {
-    view.setUint32(i, words[i / 4], true);
-  }
-  return buf;
-}
