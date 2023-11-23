@@ -12,17 +12,6 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub fn greet() -> js_sys::Uint8Array {
-    let a = js_sys::Uint8Array::new_with_length(32);
-    return a.fill(1, 0, 32);
-}
-
-#[wasm_bindgen]
-pub fn one() -> i32 {
-    return 1;
-}
-
-#[wasm_bindgen]
 pub fn test_miller() -> i32 {
     for _i in 0u32..5u32 {
         log(&format!("{}", get_random_prime(1024 / 8)));

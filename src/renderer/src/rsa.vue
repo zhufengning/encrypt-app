@@ -1,5 +1,5 @@
 <script setup>
-import init, { rsa_keygen, js_rsa_encrypt } from "my-wasm";
+import init, { rsa_keygen, js_rsa_encrypt } from "my-rsa";
 import { ref, onMounted } from "vue";
 import { splitUInt8Array, hexString2U8Array, U8Array2hexString, saveArrayBufferAsFile, padIfOdd, padArrayWithZeros, concatenateUint8Arrays } from "../../cipher/utils.mjs"
 
