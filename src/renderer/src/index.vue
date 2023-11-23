@@ -34,6 +34,10 @@ function jmp(s) {
         <v-icon>mdi-map-marker</v-icon>
         联机模式
       </v-btn>
+      <v-btn @click="jmp('/4');">
+        <v-icon>mdi-map-marker</v-icon>
+        ecc
+      </v-btn>
     </v-bottom-navigation>
   </v-layout>
 </template>

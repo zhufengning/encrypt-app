@@ -21,6 +21,7 @@
     "@electron-toolkit/utils": "^2.0.0",
     "bn.js": "^5.2.1",
     "my-rsa": "file:./my-rsa/pkg",
+    "my-ecc": "file:./my-ecc/pkg",
     "vue-router": "^4.2.5",
     "vuetify": "^3.4.2"
   },
