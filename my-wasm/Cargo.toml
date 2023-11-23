@@ -16,6 +16,7 @@ js-sys = "0.3.65"
 ibig = "0.3.6"
 rand = "0.8.5"
 getrandom = { version = "0.2", features = ["js"] }
+curve25519-dalek = "4.1.1"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires

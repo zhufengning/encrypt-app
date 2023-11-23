@@ -24,7 +24,7 @@ pub fn one() -> i32 {
 
 #[wasm_bindgen]
 pub fn test_miller() -> i32 {
-    for i in 0u32..5u32 {
+    for _i in 0u32..5u32 {
         log(&format!("{}", get_random_prime(1024 / 8)));
     }
     return 0;
