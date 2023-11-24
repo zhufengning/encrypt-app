@@ -31,7 +31,7 @@ onMounted(async () => await init())
       <v-col>
         <v-card>
           <v-card-item>
-            <v-card-title>DH密钥交换</v-card-title>
+            <v-card-title>椭圆曲线DH密钥交换</v-card-title>
           </v-card-item>
           <v-card-text>
             <v-text-field v-model="dh_pri_key" append-icon="mdi-refresh" label="私钥" type="text"
