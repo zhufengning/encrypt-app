@@ -5,9 +5,22 @@ use curve25519_dalek::{
     edwards::CompressedEdwardsY, scalar::Scalar, EdwardsPoint, MontgomeryPoint,
 };
 use js_sys::{Array, ArrayBuffer, Uint8Array};
+use lazy_static::lazy_static;
 use rand_core::OsRng;
 use utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
+
+lazy_static! {
+    static ref POINT_TABLE: Vec<EdwardsPoint> = {
+        let mut p = Vec::<EdwardsPoint>::new();
+        let mut g = curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
+        for _ in 0..65536 {
+            p.push(g);
+            g += curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
+        }
+        p
+    };
+}
 
 #[wasm_bindgen]
 extern "C" {
@@ -43,13 +56,13 @@ pub fn test_ecc() {
             .try_into()
             .unwrap(),
     );
-    let K = MontgomeryPoint(
+    let K = CompressedEdwardsY(
         hex::decode("ea23afe657cf6230e51e5620a58067b58a83f10b5c14da7a0875ad7ba92c392d")
             .unwrap()
             .try_into()
             .unwrap(),
     )
-    .to_edwards(0)
+    .decompress()
     .unwrap();
     let r = Scalar::random(&mut csprng);
     let m = g * Scalar::from(97u8);
@@ -83,19 +96,19 @@ pub fn ecc_keygen() -> JsValue {
     JsValue::from(format!(
         "{},{}",
         hex::encode(k.to_bytes()),
-        hex::encode(K.to_montgomery().as_bytes())
+        hex::encode(K.compress().as_bytes())
     ))
 }
 
 pub fn ecc_encrypt(data: &[u8], key: &[u8; 32]) -> String {
     let mut csprng = OsRng;
-    let K = MontgomeryPoint(*key).to_edwards(0).unwrap();
+    let K = CompressedEdwardsY(*key).decompress().unwrap();
 
     let g = curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
     let mut res = String::new();
     for i in data {
         let r = Scalar::random(&mut csprng);
-        let m = g * Scalar::from((*i) as u16 + 1);
+        let m = POINT_TABLE[*i as usize];
         let c1 = r * g;
         let c2 = m + r * K;
 
@@ -118,14 +131,12 @@ pub fn ecc_decrypt(data: Vec<([u8; 32], [u8; 32])>, key: &[u8; 32]) -> Vec<u8> {
         let jm = c2 - k * c1;
         let g = curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
         let mut flag = false;
-        let mut m = g;
         for i in 0u8..=255u8 {
-            if m == jm {
+            if POINT_TABLE[i as usize] == jm {
                 res.push(i);
                 flag = true;
                 break;
             }
-            m += g;
         }
         if !flag {
             panic!("Could not find point.")
