@@ -38,6 +38,14 @@ function jmp(s) {
         <v-icon>mdi-map-marker</v-icon>
         ecc
       </v-btn>
+      <v-btn @click="jmp('/dh');">
+        <v-icon>mdi-map-marker</v-icon>
+        dh
+      </v-btn>
+      <v-btn @click="jmp('/ecdh');">
+        <v-icon>mdi-map-marker</v-icon>
+        dhec
+      </v-btn>
     </v-bottom-navigation>
   </v-layout>
 </template>

@@ -1,5 +1,5 @@
 [package]
-name = "my-dh"
+name = "my-ecdh"
 version = "0.1.0"
 authors = ["zhufengning <z@zhufn.fun>"]
 edition = "2021"

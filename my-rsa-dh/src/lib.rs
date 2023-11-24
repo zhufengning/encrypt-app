@@ -1,10 +1,18 @@
 mod utils;
 
-use ibig::{modular::ModuloRing, ubig, UBig};
-
+use ibig::{
+    modular::{Modulo, ModuloRing},
+    ubig, UBig,
+};
+use lazy_static::lazy_static;
 use rand::{thread_rng, Rng};
 use wasm_bindgen::prelude::*;
 
+lazy_static! {
+    static ref DH_P: UBig = UBig::from_str_with_radix_prefix("0xffffffffffffffffadf85458a2bb4a9aafdc5620273d3cf1d8b9c583ce2d3695a9e13641146433fbcc939dce249b3ef97d2fe363630c75d8f681b202aec4617ad3df1ed5d5fd65612433f51f5f066ed0856365553ded1af3b557135e7f57c935984f0c70e0e68b77e2a689daf3efe8721df158a136ade73530acca4f483a797abc0ab182b324fb61d108a94bb2c8e3fbb96adab760d7f4681d4f42a3de394df4ae56ede76372bb190b07a7c8ee0a6d709e02fce1cdf7e2ecc03404cd28342f619172fe9ce98583ff8e4f1232eef28183c3fe3b1b4c6fad733bb5fcbc2ec22005c58ef1837d1683b2c6f34a26c1b2effa886b423861285c97ffffffffffffffff").unwrap();
+    static ref DH_RING: ModuloRing = ModuloRing::new(&DH_P);
+    static ref DH_G: UBig = ubig!(2);
+}
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
@@ -123,4 +131,48 @@ pub fn miller_rabin(p: &UBig, n: u32) -> bool {
         }
     }
     return true;
+}
+
+fn ubig_mod_pow(base: &UBig, exp: &UBig, modulus: &UBig) -> UBig {
+    if modulus == &ubig!(1) {
+        return ubig!(0);
+    }
+    let mut result = ubig!(1);
+    let mut base = base % modulus;
+    let mut exp = exp.clone();
+    while exp > ubig!(0) {
+        if &exp % 2 == 1 {
+            result = &result * &base % modulus;
+        }
+        exp = &exp / &ubig!(2);
+        base = &base * &base % modulus;
+    }
+    result
+}
+
+#[wasm_bindgen]
+pub fn dh_pri_keygen() -> JsValue {
+    JsValue::from(hex::encode(
+        (0..2048 / 8)
+            .map(|_| rand::random::<u8>())
+            .collect::<Vec<u8>>(),
+    ))
+}
+
+#[wasm_bindgen]
+pub fn dh_pub_keygen(prik: &str) -> JsValue {
+    let a = UBig::from_be_bytes(&hex::decode(prik).unwrap());
+    JsValue::from(
+        (DH_RING.from(DH_G.clone()).pow(&a))
+            .residue()
+            .in_radix(16)
+            .to_string(),
+    )
+}
+
+#[wasm_bindgen]
+pub fn dh_fin_keygen(prik: &str, pubk: &str) -> JsValue {
+    let a = UBig::from_be_bytes(&hex::decode(prik).unwrap());
+    let b = DH_RING.from(UBig::from_be_bytes(&hex::decode(pubk).unwrap()));
+    JsValue::from((b.pow(&a)).residue().in_radix(16).to_string())
 }
