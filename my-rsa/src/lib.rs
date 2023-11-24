@@ -1,8 +1,8 @@
 mod utils;
 
-use ibig::{ibig, modular::ModuloRing, ubig, UBig};
-use js_sys::Uint8Array;
-use rand::{distributions::uniform::Uniform, thread_rng, Rng};
+use ibig::{modular::ModuloRing, ubig, UBig};
+
+use rand::{thread_rng, Rng};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -25,7 +25,7 @@ pub fn rsa_keygen(nbit: usize) -> String {
     let mut p = get_random_prime(prime_len);
     let mut q = get_random_prime(prime_len);
     let mut n = &p * &q;
-    while n.bit_len() > nbit || n.bit_len() < nbit / 2 {
+    while n.bit_len() > nbit || n.bit_len() <= nbit / 2 {
         p = get_random_prime(prime_len);
         q = get_random_prime(prime_len);
         n = &p * &q;
@@ -62,7 +62,7 @@ pub fn js_rsa_encrypt(key: &str, content: js_sys::Uint8Array) -> JsValue {
 }
 
 pub fn rsa_encrypt(key: &str, content: &[u8]) -> String {
-    let (klen, n, e) = rsa_key_split(key);
+    let (_klen, n, e) = rsa_key_split(key);
     let m = UBig::from_be_bytes(content);
     // log(&format!("encrypting: {}", m));
     if m > n {
@@ -74,7 +74,8 @@ pub fn rsa_encrypt(key: &str, content: &[u8]) -> String {
 }
 
 pub fn get_random_ub(nb: usize) -> UBig {
-    let random_bytes: Vec<u8> = (0..nb).map(|_| rand::random::<u8>()).collect();
+    let mut random_bytes: Vec<u8> = (0..nb).map(|_| rand::random::<u8>()).collect();
+    random_bytes[0] &= 0b10000000u8;
     return UBig::from_be_bytes(&random_bytes);
 }
 
@@ -99,7 +100,6 @@ pub fn miller_rabin(p: &UBig, n: u32) -> bool {
         r = &r + 1;
     }
 
-    let mut flag = true;
     for _ in 0..n {
         let ring = ModuloRing::new(&p);
         let a = ring.from(thread_rng().gen_range(ubig!(2)..ri.clone()));
