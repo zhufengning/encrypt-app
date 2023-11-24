@@ -1,13 +1,9 @@
 mod utils;
-use std::fmt::format;
 
-use curve25519_dalek::{
-    edwards::CompressedEdwardsY, scalar::Scalar, EdwardsPoint, MontgomeryPoint,
-};
-use js_sys::{Array, ArrayBuffer, Uint8Array};
+use curve25519_dalek::{edwards::CompressedEdwardsY, scalar::Scalar, EdwardsPoint};
+use js_sys::Uint8Array;
 use lazy_static::lazy_static;
 use rand_core::OsRng;
-use utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
 
 lazy_static! {
@@ -33,11 +29,11 @@ pub fn test_ecc0() {
     let mut csprng = OsRng;
     let g = curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
     let k: Scalar = Scalar::random(&mut csprng);
-    let K = k * g;
+    let bigk = k * g;
     let r = Scalar::random(&mut csprng);
     let m = g * Scalar::from(225u8);
     let c1 = r * g;
-    let c2 = m + r * K;
+    let c2 = m + r * bigk;
     let jm = c2 - k * c1;
     log(&format!("{}", jm == m));
     log(&format!(
@@ -46,6 +42,7 @@ pub fn test_ecc0() {
     ));
 }
 
+/*
 #[wasm_bindgen]
 pub fn test_ecc() {
     let mut csprng = OsRng;
@@ -86,23 +83,24 @@ pub fn test_ecc() {
     let jm = c2_restore - k * c1_restore;
     log(&format!("{}", jm == m));
 }
+*/
 
 #[wasm_bindgen]
 pub fn ecc_keygen() -> JsValue {
     let mut csprng = OsRng;
     let g = curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
     let k: Scalar = Scalar::random(&mut csprng);
-    let K = k * g;
+    let bigk = k * g;
     JsValue::from(format!(
         "{},{}",
         hex::encode(k.to_bytes()),
-        hex::encode(K.compress().as_bytes())
+        hex::encode(bigk.compress().as_bytes())
     ))
 }
 
 pub fn ecc_encrypt(data: &[u8], key: &[u8; 32]) -> String {
     let mut csprng = OsRng;
-    let K = CompressedEdwardsY(*key).decompress().unwrap();
+    let bigk = CompressedEdwardsY(*key).decompress().unwrap();
 
     let g = curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
     let mut res = String::new();
@@ -110,7 +108,7 @@ pub fn ecc_encrypt(data: &[u8], key: &[u8; 32]) -> String {
         let r = Scalar::random(&mut csprng);
         let m = POINT_TABLE[*i as usize];
         let c1 = r * g;
-        let c2 = m + r * K;
+        let c2 = m + r * bigk;
 
         res += &format!(
             "{},{};",
@@ -129,7 +127,6 @@ pub fn ecc_decrypt(data: Vec<([u8; 32], [u8; 32])>, key: &[u8; 32]) -> Vec<u8> {
         let c1 = CompressedEdwardsY(c1).decompress().unwrap();
         let c2 = CompressedEdwardsY(c2).decompress().unwrap();
         let jm = c2 - k * c1;
-        let g = curve25519_dalek::constants::ED25519_BASEPOINT_POINT;
         let mut flag = false;
         for i in 0u8..=255u8 {
             if POINT_TABLE[i as usize] == jm {
@@ -171,7 +168,6 @@ fn parse_hex_string(input: &str) -> Vec<([u8; 32], [u8; 32])> {
 
 #[wasm_bindgen]
 pub fn js_ecc_decrypt(data: &str, key: &str) -> Uint8Array {
-    set_panic_hook();
     let data = parse_hex_string(data);
     let key = hex::decode(key).unwrap();
     Uint8Array::from(ecc_decrypt(data, &key.try_into().unwrap()).as_slice())
