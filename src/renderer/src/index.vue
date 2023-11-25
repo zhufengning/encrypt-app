@@ -44,7 +44,7 @@ function jmp(s) {
       </v-btn>
       <v-btn @click="jmp('/ecdh');">
         <v-icon>mdi-map-marker</v-icon>
-        dhec
+        ecdh
       </v-btn>
     </v-bottom-navigation>
   </v-layout>
