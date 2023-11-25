@@ -1,7 +1,7 @@
 <script setup>
-import init, { test_ecc, ecc_keygen, js_ecc_encrypt, js_ecc_decrypt } from "my-ecc";
+import init, { ecc_keygen, js_ecc_encrypt, js_ecc_decrypt } from "my-ecc";
 import { ref, onMounted } from "vue";
-import { splitUInt8Array, hexString2U8Array, U8Array2hexString, saveArrayBufferAsFile, padIfOdd, padArrayWithZeros, concatenateUint8Arrays } from "../../cipher/utils.mjs"
+import { hexString2U8Array, U8Array2hexString, saveArrayBufferAsFile } from "../../cipher/utils.mjs"
 
 var ecc_key1 = ref("");
 var ecc_key2 = ref("");
