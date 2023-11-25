@@ -47,7 +47,7 @@ export function keywordDecrypt(str, key) {
     }).join('');
 }
 
-function generateEncodedAlphabet(key) {
+export function generateEncodedAlphabet(key) {
     const plaintextAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let arr = new Array(26).fill(0);
     let encoded = "";
@@ -102,7 +102,7 @@ export function affineDecrypt(str, a, b) {
     }).join('');
 }
 
-function findMultiplicativeInverse(a, m) {
+export function findMultiplicativeInverse(a, m) {
     for (let i = 1; i < m; i++) {
         if ((a * i) % m === 1) return i;
     }

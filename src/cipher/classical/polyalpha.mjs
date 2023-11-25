@@ -31,7 +31,7 @@ export function vigenereDecrypt(str, key) {
     }).join('');
 }
 
-function generateKey(str, key) {
+export function generateKey(str, key) {
     if (str.length === key.length) return key;
     let temp = key.length;
     for (let i = 0; i < (str.length - temp); i++) {
