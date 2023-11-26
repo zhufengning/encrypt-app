@@ -276,8 +276,8 @@ export function desDecrypt(data, key) {
 const inputData = new Uint8Array([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF]);
 const key = new Uint8Array([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF]);
 
-const encryptedData = desEncrypt(inputData.buffer, key);
-const decryptedData = desDecrypt(encryptedData, key);
+const encryptedData = desEncrypt(inputData.buffer, key.buffer);
+const decryptedData = desDecrypt(encryptedData, key.buffer);
 
 const dataHex = Array.from(new Uint8Array(inputData))
     .map(byte => byte.toString(16).padStart(2, '0'))
