@@ -1,5 +1,5 @@
 import { padArrayWithZeros } from '../utils.mjs';
-//kaisa
+//Caesar cipher
 export function caesarEncrypt(str, k) {
     return str.split('').map(char => {
         let code = char.charCodeAt(0);

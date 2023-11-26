@@ -20,9 +20,10 @@
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
     "bn.js": "^5.2.1",
-    "my-rsa-dh": "file:./my-rsa-dh/pkg",
+    "jinrishici": "^1.0.6",
     "my-ecc": "file:./my-ecc/pkg",
     "my-ecdh": "file:./my-ecdh/pkg",
+    "my-rsa-dh": "file:./my-rsa-dh/pkg",
     "vue-router": "^4.2.5",
     "vuetify": "^3.4.2"
   },

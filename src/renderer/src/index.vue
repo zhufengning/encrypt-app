@@ -1,21 +1,31 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import {load} from "jinrishici"
 var page = ref(0)
+var shi = ref("")
 const router = useRouter()
 const route = useRoute()
 const currentRouteName = computed(() => route.name)
 function jmp(s) {
+  getShi();
   router.push(s);
 }
 
+var getShi=() => {
+  load(result => {
+    console.log(result);
+    shi.value = "——"+result.data.content;
+  });
+}
+onMounted(getShi)
 </script>
 
 <template>
   <v-layout>
 
-    <v-app-bar>
-      <v-app-bar-title>{{ currentRouteName }}</v-app-bar-title>
+    <v-app-bar color="teal-darken-4">
+      <v-app-bar-title>{{ currentRouteName + shi }}</v-app-bar-title>
     </v-app-bar>
     <v-main><router-view></router-view></v-main>
 
