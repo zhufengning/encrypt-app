@@ -235,11 +235,9 @@ export function concatenateUint8Arrays(arrays) {
 export function dealBufferBlock(data, blockSize, functionName, key) {
 
   const dealBlocks = new Uint8Array(data.length);
-  console.log(data.length)
   for (let i = 0; i < data.length; i += blockSize) {
     const block = data.slice(i, i + blockSize);
     const dealBlock = functionName(block, key);
-    console.log(dealBlock);
     dealBlocks.set(new Uint8Array(dealBlock), i);
   }
   //const concatenatedBuffer = new Uint8Array(dealBlocks.reduce((acc, block) => [...acc, ...block], []));
