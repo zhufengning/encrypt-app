@@ -226,46 +226,40 @@ export function concatenateUint8Arrays(arrays) {
 }
 
 /**
- *
- * @param {string} fileName
- * @param {string} outName
+ *@param {ArrayBuffer} data 
  * @param {number} blockSize
- * @param {string} functionName
+ * @param {Function} functionName 
  * @param {ArrayBuffer} key
- * @returns
+ * @returns {ArrayBuffer}
  */
-export function dealFileBlock(fileName, outName, blockSize, functionName, key) {
-  fs.readFile(fileName, (readErr, data) => {
-    if (readErr) {
-      console.error(readErr);
-    } else {
-      const encryptedBlocks = [];
-      for (let i = 0; i < data.length; i += blockSize) {
-        const block = data.slice(i, i + blockSize);
-        const encryptedBlock = functionName(block, key);
-        encryptedBlocks.push(Buffer.from(encryptedBlock));
-        //console.log(encryptedBlock);
-      }
-      const concatenatedBuffer = Buffer.concat(encryptedBlocks);
+export function dealBufferBlock(data, blockSize, functionName, key) {
 
-      fs.writeFile(outName, concatenatedBuffer, (writeErr) => {
-        if (writeErr) {
-          console.error(writeErr);
-        } else {
-          console.log(functionName, ' completed. Data written to ' + outName);
-        }
-      });
-    }
-  });
+  const dealBlocks = new Uint8Array(data.length);
+  console.log(data.length)
+  for (let i = 0; i < data.length; i += blockSize) {
+    const block = data.slice(i, i + blockSize);
+    const dealBlock = functionName(block, key);
+    console.log(dealBlock);
+    dealBlocks.set(new Uint8Array(dealBlock), i);
+  }
+  //const concatenatedBuffer = new Uint8Array(dealBlocks.reduce((acc, block) => [...acc, ...block], []));
+  console.log(dealBlocks);
+  return dealBlocks.buffer;
+
+
 }
 
-
+/**
+ *@param {ArrayBuffer} data 
+ *@param {number} size 
+ * @returns {ArrayBuffer}
+ */
 export function padding(data, size) {
   const originalView = new Uint8Array(data);
 
   // 计算需要填充的字节数
   const paddingSize = size - (originalView.length % size);
-  
+
   // 判断是否需要填充
   if (paddingSize !== size) {
     // 计算填充后的新大小
@@ -280,12 +274,12 @@ export function padding(data, size) {
     // 复制原始数据到新的 ArrayBuffer
     paddedView.set(originalView);
 
-    // 使用 0x00 进行填充
+    // 使用 0x20 进行填充
     for (let i = originalView.length; i < newSize; i++) {
-      paddedView[i] = 0x00;
+      paddedView[i] = 0x20;
     }
 
-    return paddedBuffer;
+    return paddedView;
   } else {
     // 如果不需要填充，直接返回原始数据
     return data;
