@@ -234,7 +234,7 @@ export function concatenateUint8Arrays(arrays) {
  * @param {arrayBuffer} key 
  * @returns
  */
-export function dealFilebyBlock(fileName, outName, blockSize, functionName, key) {
+export function dealFileBlock(fileName, outName, blockSize, functionName, key) {
   fs.readFile(fileName, (readErr, data) => {
     if (readErr) {
       console.error(readErr);
@@ -257,4 +257,22 @@ export function dealFilebyBlock(fileName, outName, blockSize, functionName, key)
       });
     }
   });
+}
+
+
+export function padding(data, size) {
+  const paddedBuffer = new ArrayBuffer(size);
+  const originalView = new Uint8Array(data);
+  const paddedView = new Uint8Array(paddedBuffer);
+  paddedView.set(originalView);
+
+  // 计算需要填充的字节数
+  const paddingSize = size - originalView.length;
+
+  // 如果需要填充，使用 0x20（空格）填充
+  for (let i = originalView.length; i < paddingSize; i++) {
+    paddedView[i] = 0x20;
+  }
+
+  return paddedBuffer;
 }
