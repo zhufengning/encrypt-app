@@ -24,6 +24,8 @@
     "my-ecc": "file:./my-ecc/pkg",
     "my-ecdh": "file:./my-ecdh/pkg",
     "my-rsa-dh": "file:./my-rsa-dh/pkg",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
     "vue-router": "^4.2.5",
     "vuetify": "^3.4.2"
   },

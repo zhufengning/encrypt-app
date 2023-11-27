@@ -1,9 +1,6 @@
 mod utils;
 
-use ibig::{
-    modular::{Modulo, ModuloRing},
-    ubig, UBig,
-};
+use ibig::{modular::ModuloRing, ubig, UBig};
 use lazy_static::lazy_static;
 use rand::{thread_rng, Rng};
 use wasm_bindgen::prelude::*;

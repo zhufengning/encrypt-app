@@ -1,3 +1,4 @@
+// Deprecated. See my-rsa-dh
 import { BN } from "bn.js";
 import { getRandomBN } from "../utils.mjs";
 

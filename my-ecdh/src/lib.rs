@@ -13,7 +13,7 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn pri_keygen() -> JsValue {
-    set_panic_hook();
+    // set_panic_hook();
     let mut rng = OsRng;
     JsValue::from(hex::encode(Scalar::random(&mut rng).as_bytes()))
 }
