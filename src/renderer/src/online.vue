@@ -61,6 +61,7 @@ function gotMsg(msg) {
       decryptMsg = new TextDecoder().decode(aesDecrypt(decodedMsg, key));
       break;
     case "DES":
+      key = key.slice(0, 16);
       decryptMsg = new TextDecoder().decode(desDecrypt(decodedMsg, key));
       break;
     case "RC4":
@@ -101,6 +102,7 @@ function sendMessage() {
       encryptMsg = aesEncrypt(encodedMsg.buffer, key);
       break;
     case "DES":
+      key = key.slice(0, 16);
       encryptMsg = desEncrypt(encodedMsg.buffer, key);
       break;
     case "RC4":
