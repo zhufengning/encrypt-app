@@ -12,7 +12,7 @@ var message = ref("");
 var final_key = ref("");
 
 var selectedCipherCategory = ref('');
-var cipherCategories = ref(['单表替代密码', '多表替代密码', '多图替代密码', '置换密码']);
+var cipherCategories = ref(['DES', 'AES', 'None']);
 
 var client_socket;
 
