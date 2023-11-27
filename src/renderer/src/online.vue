@@ -4,7 +4,8 @@ import { io } from "socket.io-client";
 import init, { pri_keygen, final_keygen, pub_keygen } from "my-ecdh"
 import { aesEncrypt, aesDecrypt } from "../../cipher/block/aes.mjs"
 import { desEncrypt, desDecrypt } from "../../cipher/block/des.mjs"
-import { hexString2U8Array } from "../../cipher/utils.mjs"
+import { rc4Encrypt, rc4Decrypt } from "../../cipher/stream/rc4.mjs"
+import { hexString2U8Array, U8Array2hexString } from "../../cipher/utils.mjs"
 var server_port = ref("3000");
 var client_url = ref("ws://localhost:3000");
 var conn_type = ref("none");
@@ -15,7 +16,7 @@ var message = ref("");
 var final_key = ref("");
 
 var selectedCipher = ref('None');
-var ciphers = ref(['DES', 'AES', 'None']);
+var ciphers = ref(['DES', 'AES', 'RC4', 'None']);
 
 var client_socket;
 
@@ -48,9 +49,10 @@ function gotKey(key) {
 }
 
 function gotMsg(msg) {
+  console.log(selectedCipher.value, msg);
   var decryptMsg;
-  const key = hexString2U8Array(final_key.value).buffer;
-  const decodedMsg = msg.buffer;
+  var key = hexString2U8Array(final_key.value).buffer;
+  var decodedMsg = msg;
   switch (selectedCipher.value) {
     case "None":
       decryptMsg = msg;
@@ -60,6 +62,10 @@ function gotMsg(msg) {
       break;
     case "DES":
       decryptMsg = new TextDecoder().decode(desDecrypt(decodedMsg, key));
+      break;
+    case "RC4":
+      var res = rc4Decrypt(decodedMsg, key);
+      decryptMsg = new TextDecoder().decode(new Uint8Array(res));
       break;
     default:
       alert("No!");
@@ -85,8 +91,8 @@ function connectServer() {
 
 function sendMessage() {
   var encryptMsg;
-  const key = hexString2U8Array(final_key.value).buffer;
-  const encodedMsg = new TextEncoder().encode(message.value);
+  var key = hexString2U8Array(final_key.value).buffer;
+  var encodedMsg = new TextEncoder().encode(message.value);
   switch (selectedCipher.value) {
     case "None":
       encryptMsg = message.value;
@@ -97,13 +103,17 @@ function sendMessage() {
     case "DES":
       encryptMsg = desEncrypt(encodedMsg.buffer, key);
       break;
+    case "RC4":
+      encryptMsg = rc4Encrypt(encodedMsg.buffer, key);
+      console.log(encodedMsg.buffer, key, encryptMsg)
+      break;
     default:
       alert("No!");
   }
   if (conn_type.value == "client") {
-    client_socket.emit("client-msg", message.value);
+    client_socket.emit("client-msg", encryptMsg);
   } else if (conn_type.value == "server") {
-    window.api.sendMsg(message.value)
+    window.api.sendMsg(encryptMsg)
   }
   msgs.value.push({ name: "You: " + message.value, value: msgs.value.length })
   message.value = "";
@@ -159,8 +169,7 @@ onMounted(async () => {
     </v-row>
     <v-row>
       <v-col>
-        <v-combobox v-model="selectedCipher" :items="ciphers" label="选择密码类别" outlined
-          @update:modelValue=updateCipherOptions></v-combobox>
+        <v-combobox v-model="selectedCipher" :items="ciphers" label="选择密码类别" outlined></v-combobox>
       </v-col>
     </v-row>
     <v-row style="overflow-y: scroll; height:50vh" height="300">
