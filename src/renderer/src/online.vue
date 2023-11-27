@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue';
 import { io } from "socket.io-client";
 import init, { pri_keygen, final_keygen, pub_keygen } from "my-ecdh"
+import { aesEncrypt, aesDecrypt } from "../../cipher/block/aes.mjs"
+import { desEncrypt, desDecrypt } from "../../cipher/block/des.mjs"
+import { hexString2U8Array } from "../../cipher/utils.mjs"
 var server_port = ref("3000");
 var client_url = ref("ws://localhost:3000");
 var conn_type = ref("none");
@@ -11,8 +14,8 @@ var pub_key = ref("");
 var message = ref("");
 var final_key = ref("");
 
-var selectedCipherCategory = ref('');
-var cipherCategories = ref(['DES', 'AES', 'None']);
+var selectedCipher = ref('None');
+var ciphers = ref(['DES', 'AES', 'None']);
 
 var client_socket;
 
@@ -45,7 +48,23 @@ function gotKey(key) {
 }
 
 function gotMsg(msg) {
-  msgs.value.push({ name: "Someone: " + msg, value: msgs.value.length });
+  var decryptMsg;
+  const key = hexString2U8Array(final_key.value).buffer;
+  const decodedMsg = msg.buffer;
+  switch (selectedCipher.value) {
+    case "None":
+      decryptMsg = msg;
+      break;
+    case "AES":
+      decryptMsg = new TextDecoder().decode(aesDecrypt(decodedMsg, key));
+      break;
+    case "DES":
+      decryptMsg = new TextDecoder().decode(desDecrypt(decodedMsg, key));
+      break;
+    default:
+      alert("No!");
+  }
+  msgs.value.push({ name: "Someone: " + decryptMsg, value: msgs.value.length });
 }
 
 function connectServer() {
@@ -65,13 +84,29 @@ function connectServer() {
 }
 
 function sendMessage() {
-  console.log(conn_type);
+  var encryptMsg;
+  const key = hexString2U8Array(final_key.value).buffer;
+  const encodedMsg = new TextEncoder().encode(message.value);
+  switch (selectedCipher.value) {
+    case "None":
+      encryptMsg = message.value;
+      break;
+    case "AES":
+      encryptMsg = aesEncrypt(encodedMsg.buffer, key);
+      break;
+    case "DES":
+      encryptMsg = desEncrypt(encodedMsg.buffer, key);
+      break;
+    default:
+      alert("No!");
+  }
   if (conn_type.value == "client") {
     client_socket.emit("client-msg", message.value);
   } else if (conn_type.value == "server") {
     window.api.sendMsg(message.value)
   }
   msgs.value.push({ name: "You: " + message.value, value: msgs.value.length })
+  message.value = "";
 }
 
 onMounted(async () => {
@@ -124,7 +159,7 @@ onMounted(async () => {
     </v-row>
     <v-row>
       <v-col>
-        <v-combobox v-model="selectedCipherCategory" :items="cipherCategories" label="选择密码类别" outlined
+        <v-combobox v-model="selectedCipher" :items="ciphers" label="选择密码类别" outlined
           @update:modelValue=updateCipherOptions></v-combobox>
       </v-col>
     </v-row>
