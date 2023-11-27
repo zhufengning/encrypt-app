@@ -5,7 +5,7 @@ import init, { pri_keygen, final_keygen, pub_keygen } from "my-ecdh"
 import { aesEncrypt, aesDecrypt } from "../../cipher/block/aes.mjs"
 import { desEncrypt, desDecrypt } from "../../cipher/block/des.mjs"
 import { rc4Encrypt, rc4Decrypt } from "../../cipher/stream/rc4.mjs"
-import { hexString2U8Array, U8Array2hexString } from "../../cipher/utils.mjs"
+import { hexString2U8Array, padding } from "../../cipher/utils.mjs"
 var server_port = ref("3000");
 var client_url = ref("ws://localhost:3000");
 var conn_type = ref("none");
@@ -98,9 +98,11 @@ function sendMessage() {
       encryptMsg = message.value;
       break;
     case "AES":
+      encodedMsg = padding(encodedMsg, 32);
       encryptMsg = aesEncrypt(encodedMsg.buffer, key);
       break;
     case "DES":
+      encodedMsg = padding(encodedMsg, 16);
       encryptMsg = desEncrypt(encodedMsg.buffer, key);
       break;
     case "RC4":
