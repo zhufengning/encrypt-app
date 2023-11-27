@@ -261,18 +261,33 @@ export function dealFileBlock(fileName, outName, blockSize, functionName, key) {
 
 
 export function padding(data, size) {
-  const paddedBuffer = new ArrayBuffer(size);
   const originalView = new Uint8Array(data);
-  const paddedView = new Uint8Array(paddedBuffer);
-  paddedView.set(originalView);
 
   // 计算需要填充的字节数
-  const paddingSize = size - originalView.length;
+  const paddingSize = size - (originalView.length % size);
+  
+  // 判断是否需要填充
+  if (paddingSize !== size) {
+    // 计算填充后的新大小
+    const newSize = originalView.length + paddingSize;
 
-  // 如果需要填充，使用 0x20（空格）填充
-  for (let i = originalView.length; i < paddingSize; i++) {
-    paddedView[i] = 0x20;
+    // 创建一个新的 ArrayBuffer 来存储填充后的数据
+    const paddedBuffer = new ArrayBuffer(newSize);
+
+    // 创建视图以便写入填充数据
+    const paddedView = new Uint8Array(paddedBuffer);
+
+    // 复制原始数据到新的 ArrayBuffer
+    paddedView.set(originalView);
+
+    // 使用 0x00 进行填充
+    for (let i = originalView.length; i < newSize; i++) {
+      paddedView[i] = 0x00;
+    }
+
+    return paddedBuffer;
+  } else {
+    // 如果不需要填充，直接返回原始数据
+    return data;
   }
-
-  return paddedBuffer;
 }

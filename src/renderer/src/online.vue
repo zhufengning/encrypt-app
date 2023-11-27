@@ -5,7 +5,8 @@ import init, { pri_keygen, final_keygen, pub_keygen } from "my-ecdh"
 import { aesEncrypt, aesDecrypt } from "../../cipher/block/aes.mjs"
 import { desEncrypt, desDecrypt } from "../../cipher/block/des.mjs"
 import { rc4Encrypt, rc4Decrypt } from "../../cipher/stream/rc4.mjs"
-import { hexString2U8Array, padding } from "../../cipher/utils.mjs"
+import { hexString2U8Array } from "../../cipher/utils.mjs"
+import { padding } from '../../cipher/utils.mjs';
 var server_port = ref("3000");
 var client_url = ref("ws://localhost:3000");
 var conn_type = ref("none");
@@ -58,11 +59,16 @@ function gotMsg(msg) {
       decryptMsg = msg;
       break;
     case "AES":
-      decryptMsg = new TextDecoder().decode(aesDecrypt(decodedMsg, key));
+      decryptMsg = aesDecrypt(decodedMsg, key);
+      decryptMsg = Array.from(decryptMsg)
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
       break;
     case "DES":
       key = key.slice(0, 16);
-      decryptMsg = new TextDecoder().decode(desDecrypt(decodedMsg, key));
+      decryptMsg = Array.from(decryptMsg)
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
       break;
     case "RC4":
       var res = rc4Decrypt(decodedMsg, key);
@@ -99,13 +105,13 @@ function sendMessage() {
       encryptMsg = message.value;
       break;
     case "AES":
-      encodedMsg = padding(encodedMsg, 32);
-      encryptMsg = aesEncrypt(encodedMsg.buffer, key);
+      encodedMsg=padding(encodedMsg,16);
+      encryptMsg = aesEncrypt(encodedMsg, key);
       break;
     case "DES":
-      encodedMsg = padding(encodedMsg, 16);
-      key = key.slice(0, 16);
-      encryptMsg = desEncrypt(encodedMsg.buffer, key);
+      key = key.slice(0, 8);
+      encodedMsg= padding(encodedMsg,8);
+      encryptMsg = desEncrypt(encodedMsg, key);
       break;
     case "RC4":
       encryptMsg = rc4Encrypt(encodedMsg.buffer, key);
