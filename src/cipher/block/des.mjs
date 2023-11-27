@@ -1,3 +1,5 @@
+import { dealFileBlock } from "../utils.mjs";
+
 const PC1_Table = [
     57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18,
     10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60, 52, 44, 36,
@@ -272,22 +274,27 @@ export function desDecrypt(data, key) {
     return block.buffer;
 }
 
-// 例子
-const inputData = new Uint8Array([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF]);
-const key = new Uint8Array([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF]);
+// // 例子
+// const inputData = new Uint8Array([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF]);
+// const key = new Uint8Array([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF]);
 
-const encryptedData = desEncrypt(inputData.buffer, key.buffer);
-const decryptedData = desDecrypt(encryptedData, key.buffer);
+// const encryptedData = desEncrypt(inputData.buffer, key.buffer);
+// const decryptedData = desDecrypt(encryptedData, key.buffer);
 
-const dataHex = Array.from(new Uint8Array(inputData))
-    .map(byte => byte.toString(16).padStart(2, '0'))
-    .join('');
-const enHex = Array.from(new Uint8Array(encryptedData))
-    .map(byte => byte.toString(16).padStart(2, '0'))
-    .join('');
-const deHex = Array.from(new Uint8Array(decryptedData))
-    .map(byte => byte.toString(16).padStart(2, '0'))
-    .join('');
-console.log(dataHex);
-console.log(enHex);
-console.log(deHex);
+// const dataHex = Array.from(new Uint8Array(inputData))
+//     .map(byte => byte.toString(16).padStart(2, '0'))
+//     .join('');
+// const enHex = Array.from(new Uint8Array(encryptedData))
+//     .map(byte => byte.toString(16).padStart(2, '0'))
+//     .join('');
+// const deHex = Array.from(new Uint8Array(decryptedData))
+//     .map(byte => byte.toString(16).padStart(2, '0'))
+//     .join('');
+// console.log(dataHex);
+// console.log(enHex);
+// console.log(deHex);
+
+
+
+// dealFileBlock("README.md","endata.txt",16,desEncrypt,key);
+// dealFileBlock("endata.txt","dedata.txt",16,desDecrypt,key);

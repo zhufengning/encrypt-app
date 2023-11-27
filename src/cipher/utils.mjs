@@ -1,4 +1,6 @@
+/* eslint-disable prettier/prettier */
 import BN from "bn.js";
+import fs from 'fs';
 
 /**
  *
@@ -221,4 +223,38 @@ export function concatenateUint8Arrays(arrays) {
   });
 
   return result;
+}
+
+/**
+ *
+ * @param {string} fileName
+ * @param {string} outName
+ * @param {number} blockSize 
+ * @param {string} functionName 
+ * @param {arrayBuffer} key 
+ * @returns
+ */
+export function dealFilebyBlock(fileName, outName, blockSize, functionName, key) {
+  fs.readFile(fileName, (readErr, data) => {
+    if (readErr) {
+      console.error(readErr);
+    } else {
+      const encryptedBlocks = [];
+      for (let i = 0; i < data.length; i += blockSize) {
+        const block = data.slice(i, i + blockSize);
+        const encryptedBlock = functionName(block, key);
+        encryptedBlocks.push(Buffer.from(encryptedBlock));
+        //console.log(encryptedBlock);
+      }
+      const concatenatedBuffer = Buffer.concat(encryptedBlocks);
+      
+      fs.writeFile(outName, concatenatedBuffer, (writeErr) => {
+        if (writeErr) {
+          console.error(writeErr);
+        } else {
+          console.log(functionName,' completed. Data written to ' + outName);
+        }
+      });
+    }
+  });
 }
