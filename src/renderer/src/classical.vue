@@ -7,7 +7,7 @@ import * as polyalpha from '../../cipher/classical/polyalpha.mjs';
 import * as playfair from '../../cipher/classical/pf.mjs';
 
 var selectedCipherCategory = ref('');
-var cipherCategories = ref(['单表替代密码', '多表替代密码', '多图替代密码', '置换密码','块密码','流密码']);
+var cipherCategories = ref(['单表替代密码', '多表替代密码', '多图替代密码', '置换密码', '块密码', '流密码', '散列函数']);
 var selectedCipher = ref('');
 var ciphers = ref([]);
 var inputText = ref('');
@@ -17,7 +17,8 @@ var outputText = ref('');
 var isEncrypt = ref(true);
 
 function needsKey() {
-    return true;
+
+    return selectedCipher.value != 'md5';
 }
 
 function updateCipherOptions() {
@@ -26,11 +27,12 @@ function updateCipherOptions() {
         '多表替代密码': ['Vigenere cipher', 'Autokey ciphertext', 'Autokey plaintext'],
         '多图替代密码': ['Playfair cipher'],
         '置换密码': ['Column permutation cipher', 'Double-Transposition cipher'],
-        '块密码': ['aes','des'],
+        '块密码': ['aes', 'des'],
         '流密码': ['rc4'],
+        '散列函数': ['md5'],
     };
     ciphers.value = cipherOptions[selectedCipherCategory.value] || [];
-    selectedCipher.value="";
+    selectedCipher.value = "";
     // console.log(ciphers.value, selectedCipherCategory.value)
 
 }
@@ -160,7 +162,7 @@ async function decrypt() {
         </v-row>
 
         <!-- 密钥输入 -->
-        <v-row v-if="needsKey">
+        <v-row v-if="needsKey()">
             <v-col cols="12">
                 <v-text-field v-model="key" label="密钥1" hint="请输入密钥" persistent-hint outlined></v-text-field>
                 <!-- 如果是双重置换密码，显示第二个密钥输入框 -->
