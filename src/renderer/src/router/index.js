@@ -6,7 +6,8 @@ import online from '../online.vue'
 import ecc from '../ecc.vue'
 import dh from '../dh.vue'
 import ecdh from '../ecdh.vue'
-
+import asym from '../asym.vue'
+import key_ex from '../key_ex.vue'
 
 const routes = [
   { path: '/1', component: classical, name: "经典密码" },
@@ -15,6 +16,8 @@ const routes = [
   { path: '/ecdh', component: ecdh, name: "椭圆曲线DH密钥交换" },
   { path: '/dh', component: dh, name: "DH密钥交换" },
   { path: '/3', component: online, name: "联机" },
+  { path: '/5', component: asym, name: "非对称密码" },
+  { path: '/6', component: key_ex, name: "密钥交换" },
   { path: '/', redirect: '/1' },
 ]
 

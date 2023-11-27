@@ -172,7 +172,7 @@ async function decrypt() {
         </v-row>
 
         <!-- 操作类型选择 -->
-        <v-row>
+        <v-row v-if="needsKey()">
             <v-col cols="12" sm="6">
                 <v-switch color="primary" v-model="isEncrypt" :label="`操作类型： ${isEncrypt ? '加密' : '解密'}`"></v-switch>
             </v-col>

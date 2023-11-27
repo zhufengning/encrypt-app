@@ -8,7 +8,7 @@ const router = useRouter()
 const route = useRoute()
 const currentRouteName = computed(() => route.name)
 function jmp(s) {
-  getShi();
+  // getShi();
   router.push(s);
 }
 
@@ -35,26 +35,34 @@ onMounted(getShi)
         经典密码
       </v-btn>
 
-      <v-btn @click="jmp('/2');">
+      <!-- <v-btn @click="jmp('/2');">
         <v-icon>mdi-heart</v-icon>
         rsa
-      </v-btn>
+      </v-btn> -->
 
       <v-btn @click="jmp('/3');">
         <v-icon>mdi-map-marker</v-icon>
         联机模式
       </v-btn>
-      <v-btn @click="jmp('/4');">
+      <!-- <v-btn @click="jmp('/4');">
         <v-icon>mdi-map-marker</v-icon>
         ecc
-      </v-btn>
-      <v-btn @click="jmp('/dh');">
+      </v-btn> -->
+      <!-- <v-btn @click="jmp('/dh');">
         <v-icon>mdi-map-marker</v-icon>
         dh
       </v-btn>
       <v-btn @click="jmp('/ecdh');">
         <v-icon>mdi-map-marker</v-icon>
         ecdh
+      </v-btn> -->
+      <v-btn @click="jmp('/5');">
+        <v-icon>mdi-map-marker</v-icon>
+        非对称密码
+      </v-btn>
+      <v-btn @click="jmp('/6');">
+        <v-icon>mdi-map-marker</v-icon>
+        密钥交换
       </v-btn>
     </v-bottom-navigation>
   </v-layout>
