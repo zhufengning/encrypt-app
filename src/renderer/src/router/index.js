@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
-import a from '../a.vue'
+import classical from '../classical.vue'
 import rsa from '../rsa.vue'
 import c from '../c.vue'
 import ecc from '../ecc.vue'
@@ -9,7 +9,7 @@ import ecdh from '../ecdh.vue'
 
 
 const routes = [
-  { path: '/1', component: a, name: "经典" },
+  { path: '/1', component: classical, name: "经典密码" },
   { path: '/2', component: rsa, name: "rsa" },
   { path: '/4', component: ecc, name: "ecc(Curve25519)" },
   { path: '/ecdh', component: ecdh, name: "椭圆曲线DH密钥交换" },
