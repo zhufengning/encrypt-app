@@ -11,6 +11,9 @@ var pub_key = ref("");
 var message = ref("");
 var final_key = ref("");
 
+var selectedCipherCategory = ref('');
+var cipherCategories = ref(['单表替代密码', '多表替代密码', '多图替代密码', '置换密码']);
+
 var client_socket;
 
 function reset() {
@@ -68,10 +71,12 @@ function sendMessage() {
   } else if (conn_type.value == "server") {
     window.api.sendMsg(message.value)
   }
-  msgs.value.push({ name: "You: " + message.value + '\n' + "test", value: msgs.value.length })
+  msgs.value.push({ name: "You: " + message.value, value: msgs.value.length })
 }
 
 onMounted(async () => {
+
+  try { window.api.closeWsServer(); } catch (e) { }
   await init();
   keygen();
 })
@@ -116,6 +121,12 @@ onMounted(async () => {
     </v-row>
     <v-row v-if="conn_type == 'client'">
       客户端模式，服务器：{{ client_url }}
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-combobox v-model="selectedCipherCategory" :items="cipherCategories" label="选择密码类别" outlined
+          @update:modelValue=updateCipherOptions></v-combobox>
+      </v-col>
     </v-row>
     <v-row style="overflow-y: scroll; height:50vh" height="300">
       <v-col>
