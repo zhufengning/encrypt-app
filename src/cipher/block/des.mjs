@@ -1,3 +1,5 @@
+import { dealFileBlock } from "../utils.mjs";
+
 const PC1_Table = [
     57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18,
     10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60, 52, 44, 36,
@@ -291,3 +293,8 @@ export function desDecrypt(data, key) {
 // console.log(dataHex);
 // console.log(enHex);
 // console.log(deHex);
+
+
+
+// dealFileBlock("README.md","endata.txt",16,desEncrypt,key);
+// dealFileBlock("endata.txt","dedata.txt",16,desDecrypt,key);
