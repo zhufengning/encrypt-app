@@ -229,9 +229,9 @@ export function concatenateUint8Arrays(arrays) {
  *
  * @param {string} fileName
  * @param {string} outName
- * @param {number} blockSize 
- * @param {string} functionName 
- * @param {arrayBuffer} key 
+ * @param {number} blockSize
+ * @param {string} functionName
+ * @param {ArrayBuffer} key
  * @returns
  */
 export function dealFileBlock(fileName, outName, blockSize, functionName, key) {
@@ -247,12 +247,12 @@ export function dealFileBlock(fileName, outName, blockSize, functionName, key) {
         //console.log(encryptedBlock);
       }
       const concatenatedBuffer = Buffer.concat(encryptedBlocks);
-      
+
       fs.writeFile(outName, concatenatedBuffer, (writeErr) => {
         if (writeErr) {
           console.error(writeErr);
         } else {
-          console.log(functionName,' completed. Data written to ' + outName);
+          console.log(functionName, ' completed. Data written to ' + outName);
         }
       });
     }
