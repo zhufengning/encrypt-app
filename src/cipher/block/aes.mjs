@@ -1,5 +1,3 @@
-import { dealFileBlock } from "../utils.mjs";
-
 const MIX_C = [[0x2, 0x3, 0x1, 0x1], [0x1, 0x2, 0x3, 0x1], [0x1, 0x1, 0x2, 0x3], [0x3, 0x1, 0x1, 0x2]];
 const I_MIXC = [[0xe, 0xb, 0xd, 0x9], [0x9, 0xe, 0xb, 0xd], [0xd, 0x9, 0xe, 0xb], [0xb, 0xd, 0x9, 0xe]];
 const RCon = [0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x1B000000, 0x36000000];
@@ -155,7 +153,7 @@ function mixColumns(State) {
 
 
 export function aesEncrypt(data, key) {
-    let dataBytes = new Uint8Array(data);
+    let dataBytes = new Uint16Array(data);
     let expandedKey = keyExpansion(key);
 
     for (let i = 0; i < 44; i++) {
@@ -203,7 +201,7 @@ function invMixColumns(State) {
 }
 
 export function aesDecrypt(data, key) {
-    let dataBytes = new Uint8Array(data);
+    let dataBytes = new Uint16Array(data);
     let expandedKey = keyExpansion(key);
 
     for (let i = 0; i < 44; i++) {
@@ -248,6 +246,3 @@ export function aesDecrypt(data, key) {
 //     .map(byte => byte.toString(16).padStart(2, '0'))
 //     .join('');
 // console.log(deHex);
-
-// dealFileBlock("README.md","endata.txt",32,aesEncrypt,key);
-// dealFileBlock("endata.txt","dedata.txt",32,aesDecrypt,key);

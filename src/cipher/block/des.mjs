@@ -1,5 +1,3 @@
-import { dealFileBlock } from "../utils.mjs";
-
 const PC1_Table = [
     57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18,
     10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60, 52, 44, 36,
@@ -134,8 +132,8 @@ function keyInit(key) {
     const roundKeys = [];
     for (let round = 0; round < 16; round++) {
         // 循环左移
-        left=leftRotation(left,shifts[round]);
-        right=leftRotation(right,shifts[round]);
+        left = leftRotation(left, shifts[round]);
+        right = leftRotation(right, shifts[round]);
 
         // 合并左右部分
         const combined = new Uint8Array(56);
@@ -247,7 +245,7 @@ export function desEncrypt(data, key) {
     block.set(left, 32);
     // 逆初始置换 IPR
     block = IPR(block);
-    
+
     // 返回加密结果
     return block.buffer;
 }
@@ -274,8 +272,8 @@ export function desDecrypt(data, key) {
     return block.buffer;
 }
 
-// // 例子
-// const inputData = new Uint8Array([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF]);
+//例子
+// let inputData = new Uint8Array([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF]);
 // const key = new Uint8Array([0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF]);
 
 // const encryptedData = desEncrypt(inputData.buffer, key.buffer);
@@ -293,8 +291,3 @@ export function desDecrypt(data, key) {
 // console.log(dataHex);
 // console.log(enHex);
 // console.log(deHex);
-
-
-
-// dealFileBlock("README.md","endata.txt",16,desEncrypt,key);
-// dealFileBlock("endata.txt","dedata.txt",16,desDecrypt,key);

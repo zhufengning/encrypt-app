@@ -22,6 +22,36 @@ export function arrayBuffer2Str(s) {
 
 /**
  *
+ * @param {string} hexString
+ * @returns {Uint8Array}
+ */
+export function hexString2U8Array(hexString) {
+  if (hexString.length % 2 != 0) {
+    hexString = "0" + hexString
+  }
+  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+}
+
+
+/**
+ *
+ * @param {Uint8Arraystring} bytes
+ * @returns {string}
+ */
+export function U8Array2hexString(bytes) {
+  return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
+}
+
+export function arrayBuffer2HexString(buffer) {
+  const byteArray = new Uint8Array(buffer);
+  return Array.from(byteArray)
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+
+/**
+ *
  * @param {number} len_byte 长度byte
  * @returns {ArrayBuffer}
  */
@@ -129,27 +159,6 @@ export function getRandomPrime(len_byte) {
   return r;
 }
 
-/**
- *
- * @param {string} hexString
- * @returns {Uint8Array}
- */
-export function hexString2U8Array(hexString) {
-  if (hexString.length % 2 != 0) {
-    hexString = "0" + hexString
-  }
-  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
-}
-
-
-/**
- *
- * @param {Uint8Arraystring} bytes
- * @returns {string}
- */
-export function U8Array2hexString(bytes) {
-  return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
-}
 
 /**
  *
@@ -226,53 +235,59 @@ export function concatenateUint8Arrays(arrays) {
 }
 
 /**
- *
- * @param {string} fileName
- * @param {string} outName
+ *@param {ArrayBuffer} data 
  * @param {number} blockSize
- * @param {string} functionName
+ * @param {Function} functionName 
  * @param {ArrayBuffer} key
- * @returns
+ * @returns {ArrayBuffer}
  */
-export function dealFileBlock(fileName, outName, blockSize, functionName, key) {
-  fs.readFile(fileName, (readErr, data) => {
-    if (readErr) {
-      console.error(readErr);
-    } else {
-      const encryptedBlocks = [];
-      for (let i = 0; i < data.length; i += blockSize) {
-        const block = data.slice(i, i + blockSize);
-        const encryptedBlock = functionName(block, key);
-        encryptedBlocks.push(Buffer.from(encryptedBlock));
-        //console.log(encryptedBlock);
-      }
-      const concatenatedBuffer = Buffer.concat(encryptedBlocks);
+export function dealBufferBlock(data, blockSize, functionName, key) {
+  const dealBlocks = new Uint8Array(data.length);
+  for (let i = 0; i < data.length; i += blockSize) {
+    const block = data.slice(i, i + blockSize);
+    const dealBlock = functionName(block, key);
+    dealBlocks.set(new Uint8Array(dealBlock), i);
+  }
+  //const concatenatedBuffer = new Uint8Array(dealBlocks.reduce((acc, block) => [...acc, ...block], []));
+  console.log(data.length,"\n",dealBlocks);
+  return dealBlocks.buffer;
 
-      fs.writeFile(outName, concatenatedBuffer, (writeErr) => {
-        if (writeErr) {
-          console.error(writeErr);
-        } else {
-          console.log(functionName, ' completed. Data written to ' + outName);
-        }
-      });
-    }
-  });
+
 }
 
-
+/**
+ *@param {ArrayBuffer} data 
+ *@param {number} size 
+ * @returns {ArrayBuffer}
+ */
 export function padding(data, size) {
-  const paddedBuffer = new ArrayBuffer(size);
   const originalView = new Uint8Array(data);
-  const paddedView = new Uint8Array(paddedBuffer);
-  paddedView.set(originalView);
 
   // 计算需要填充的字节数
-  const paddingSize = size - originalView.length;
+  const paddingSize = size - (originalView.length % size);
 
-  // 如果需要填充，使用 0x20（空格）填充
-  for (let i = originalView.length; i < paddingSize; i++) {
-    paddedView[i] = 0x20;
+  // 判断是否需要填充
+  if (paddingSize !== size) {
+    // 计算填充后的新大小
+    const newSize = originalView.length + paddingSize;
+
+    // 创建一个新的 ArrayBuffer 来存储填充后的数据
+    const paddedBuffer = new ArrayBuffer(newSize);
+
+    // 创建视图以便写入填充数据
+    const paddedView = new Uint8Array(paddedBuffer);
+
+    // 复制原始数据到新的 ArrayBuffer
+    paddedView.set(originalView);
+
+    // 使用 0x20 进行填充
+    for (let i = originalView.length; i < newSize; i++) {
+      paddedView[i] = 0x20;
+    }
+
+    return paddedView;
+  } else {
+    // 如果不需要填充，直接返回原始数据
+    return data;
   }
-
-  return paddedBuffer;
 }

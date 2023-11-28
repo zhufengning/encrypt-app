@@ -5,7 +5,9 @@ import init, { pri_keygen, final_keygen, pub_keygen } from "my-ecdh"
 import { aesEncrypt, aesDecrypt } from "../../cipher/block/aes.mjs"
 import { desEncrypt, desDecrypt } from "../../cipher/block/des.mjs"
 import { rc4Encrypt, rc4Decrypt } from "../../cipher/stream/rc4.mjs"
-import { hexString2U8Array, U8Array2hexString } from "../../cipher/utils.mjs"
+import { hexString2U8Array } from "../../cipher/utils.mjs"
+import { padding,dealBufferBlock } from '../../cipher/utils.mjs';
+
 var server_port = ref("3000");
 var client_url = ref("ws://localhost:3000");
 var conn_type = ref("none");
@@ -58,11 +60,20 @@ function gotMsg(msg) {
       decryptMsg = msg;
       break;
     case "AES":
-      decryptMsg = new TextDecoder().decode(aesDecrypt(decodedMsg, key));
+      // for (let i = 0; i < decodedMsg.length; i += 2) {
+      //   decodedMsg[i / 2] = decodedMsg[i];
+      // }
+
+      // // 去除多余0后,使用 slice 方法截断数组
+      // decodedMsg=decodedMsg.slice(0,decodedMsg.length / 2);
+
+      decryptMsg = dealBufferBlock(decodedMsg,16, aesDecrypt, key);
+      decryptMsg = new TextDecoder().decode(new Uint16Array(decryptMsg));
       break;
     case "DES":
       key = key.slice(0, 16);
-      decryptMsg = new TextDecoder().decode(desDecrypt(decodedMsg, key));
+      decryptMsg = dealBufferBlock(decodedMsg,8, desDecrypt, key);
+      decryptMsg = new TextDecoder().decode(new Uint8Array(decryptMsg));
       break;
     case "RC4":
       var res = rc4Decrypt(decodedMsg, key);
@@ -94,16 +105,19 @@ function sendMessage() {
   var encryptMsg;
   var key = hexString2U8Array(final_key.value).buffer;
   var encodedMsg = new TextEncoder().encode(message.value);
+  console.log(key, "\n", encodedMsg);
   switch (selectedCipher.value) {
     case "None":
       encryptMsg = message.value;
       break;
     case "AES":
-      encryptMsg = aesEncrypt(encodedMsg.buffer, key);
+      encodedMsg = padding(encodedMsg, 16);
+      encryptMsg = dealBufferBlock(encodedMsg,16, aesEncrypt, key);
       break;
     case "DES":
       key = key.slice(0, 16);
-      encryptMsg = desEncrypt(encodedMsg.buffer, key);
+      encodedMsg = padding(encodedMsg, 8);
+      encryptMsg = dealBufferBlock(encodedMsg,8, desEncrypt, key);
       break;
     case "RC4":
       encryptMsg = rc4Encrypt(encodedMsg.buffer, key);
