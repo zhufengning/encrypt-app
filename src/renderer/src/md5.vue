@@ -10,7 +10,8 @@ var selectedCipher = ref('');
 var ciphers = ref([]);
 var inputText = ref('');
 var outputText = ref('');
-var isEncrypt = ref(true);
+var chosen_file = ref();
+var isFile = ref(true);
 
 function updateCipherOptions() {
     const cipherOptions = {
@@ -22,16 +23,24 @@ function updateCipherOptions() {
 
 }
 function operate() {
-    if (isEncrypt.value) {
-        encrypt();
+    if (isFile.value) {
+        hashC();
+    }
+    else {
+        file_change();
     }
 }
 
-async function encrypt() {
+async function hashC() {
     try {
         switch (selectedCipher.value) {
             case 'md5':
-                outputText.value = utils.arrayBuffer2HexString(md5.md5Calculate(utils.str2ArrayBuffer(inputText.value)));
+                if (chosen_file.value[0]) {
+                    outputText.value = utils.arrayBuffer2HexString(md5.md5Calculate(new Uint8Array(inputText.value)));
+                }
+                else {
+                    outputText.value = utils.arrayBuffer2HexString(md5.md5Calculate(utils.str2ArrayBuffer(inputText.value)));
+                }
                 break;
             default:
                 outputText.value = '请选择一个哈希摘要算法';
@@ -41,6 +50,17 @@ async function encrypt() {
     }
 
 }
+
+function file_change() {
+    let reader = new FileReader();
+
+    reader.readAsText(chosen_file.value[0]);
+    reader.onload = () => {
+        inputText.value = reader.result;
+    }
+
+}
+
 </script>
   
 <template>
@@ -65,6 +85,12 @@ async function encrypt() {
             <v-col cols="12" sm="6">
                 <v-textarea v-model="outputText" label="密文/原文" outlined readonly></v-textarea>
             </v-col>
+        </v-row>
+
+        <v-row>
+            <v-file-input label="导入文件" prepend-icon="mdi-import" v-model="chosen_file" @change="file_change" chips
+                accept="*">
+            </v-file-input>
         </v-row>
 
         <v-row>
