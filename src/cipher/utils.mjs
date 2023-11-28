@@ -22,6 +22,36 @@ export function arrayBuffer2Str(s) {
 
 /**
  *
+ * @param {string} hexString
+ * @returns {Uint8Array}
+ */
+export function hexString2U8Array(hexString) {
+  if (hexString.length % 2 != 0) {
+    hexString = "0" + hexString
+  }
+  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+}
+
+
+/**
+ *
+ * @param {Uint8Arraystring} bytes
+ * @returns {string}
+ */
+export function U8Array2hexString(bytes) {
+  return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
+}
+
+export function arrayBuffer2HexString(buffer) {
+  const byteArray = new Uint8Array(buffer);
+  return Array.from(byteArray)
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+
+/**
+ *
  * @param {number} len_byte 长度byte
  * @returns {ArrayBuffer}
  */
@@ -129,27 +159,6 @@ export function getRandomPrime(len_byte) {
   return r;
 }
 
-/**
- *
- * @param {string} hexString
- * @returns {Uint8Array}
- */
-export function hexString2U8Array(hexString) {
-  if (hexString.length % 2 != 0) {
-    hexString = "0" + hexString
-  }
-  return Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
-}
-
-
-/**
- *
- * @param {Uint8Arraystring} bytes
- * @returns {string}
- */
-export function U8Array2hexString(bytes) {
-  return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
-}
 
 /**
  *

@@ -92,7 +92,7 @@ async function encrypt() {
                 console.log(encryptMsg);
                 encryptMsg = utils.dealBufferBlock(encryptMsg,8, desEncrypt, keyP);
                 console.log(encryptMsg);
-                outputText.value = utils.U8Array2hexString(encryptMsg);
+                outputText.value = utils.arrayBuffer2HexString(encryptMsg);
                 console.log(outputText.value);
                 break;
             case 'AES':
@@ -100,13 +100,13 @@ async function encrypt() {
                 keyP = keyP.slice(0, 16);
                 var encryptMsg = utils.padding(utils.str2ArrayBuffer(inputText.value), 16);
                 encryptMsg = utils.dealBufferBlock(encryptMsg,16, aesEncrypt, keyP);
-                outputText.value = utils.U8Array2hexString(encryptMsg);
+                outputText.value = utils.arrayBuffer2HexString(encryptMsg);
                 break;
             case 'RC4':
-                outputText.value = utils.U8Array2hexString(rc4.rc4Encrypt(utils.str2ArrayBuffer(inputText.value), key.value));
+                outputText.value = utils.arrayBuffer2HexString(rc4.rc4Encrypt(utils.str2ArrayBuffer(inputText.value), key.value));
                 break;
             case 'MD5':
-                outputText.value = utils.U8Array2hexString(md5.md5Calculate(utils.str2ArrayBuffer(inputText.value)));
+                outputText.value = utils.arrayBuffer2HexString(md5.md5Calculate(utils.str2ArrayBuffer(inputText.value)));
                 break;
             default:
                 outputText.value = '请选择一个加密算法';
@@ -163,7 +163,7 @@ async function decrypt() {
                 keyP = keyP.slice(0, 32);
                 var encryptMsg = utils.padding(utils.hexString2U8Array(inputText.value), 16);
                 encryptMsg = utils.dealBufferBlock(encryptMsg,16, aesDecrypt, keyP);
-                outputText.value = utils.U8Array2hexString(encryptMsg);
+                outputText.value = utils.arrayBuffer2Str(encryptMsg);
                 break;
             case 'RC4':
                 outputText.value = utils.arrayBuffer2Str(rc4.rc4Encrypt(utils.hexString2U8Array(inputText.value), key.value));
