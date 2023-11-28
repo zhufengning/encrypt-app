@@ -8,6 +8,8 @@ import dh from '../dh.vue'
 import ecdh from '../ecdh.vue'
 import asym from '../asym.vue'
 import key_ex from '../key_ex.vue'
+import md5 from '../md5.vue'
+
 
 const routes = [
   { path: '/1', component: classical, name: "经典密码" },
@@ -18,6 +20,7 @@ const routes = [
   { path: '/3', component: online, name: "联机" },
   { path: '/5', component: asym, name: "非对称密码" },
   { path: '/6', component: key_ex, name: "密钥交换" },
+  { path: '/7', component: md5, name: "md5" },
   { path: '/', redirect: '/1' },
 ]
 

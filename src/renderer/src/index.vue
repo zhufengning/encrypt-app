@@ -2,6 +2,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import {load} from "jinrishici"
+
+
 var page = ref(0)
 var shi = ref("")
 const router = useRouter()
@@ -31,17 +33,17 @@ onMounted(getShi)
 
     <v-bottom-navigation v-model="page" active color="primary">
       <v-btn @click="jmp('/1');">
-        <v-icon>mdi-history</v-icon>
-        经典密码
+        <v-icon>mdi-debian</v-icon>
+        对称加密  
       </v-btn>
 
-      <!-- <v-btn @click="jmp('/2');">
-        <v-icon>mdi-heart</v-icon>
-        rsa
-      </v-btn> -->
+      <v-btn @click="jmp('/7');">
+        <v-icon>mdi-ubuntu</v-icon>
+        md5
+      </v-btn>
 
       <v-btn @click="jmp('/3');">
-        <v-icon>mdi-map-marker</v-icon>
+        <v-icon>mdi-fedora</v-icon>
         联机模式
       </v-btn>
       <!-- <v-btn @click="jmp('/4');">
@@ -57,11 +59,11 @@ onMounted(getShi)
         ecdh
       </v-btn> -->
       <v-btn @click="jmp('/5');">
-        <v-icon>mdi-map-marker</v-icon>
+        <v-icon>mdi-arch</v-icon>
         非对称密码
       </v-btn>
       <v-btn @click="jmp('/6');">
-        <v-icon>mdi-map-marker</v-icon>
+        <v-icon>mdi-linux</v-icon>
         密钥交换
       </v-btn>
     </v-bottom-navigation>
