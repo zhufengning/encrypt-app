@@ -83,26 +83,26 @@ async function encrypt() {
                 const keys = key.value.split(','); // Assuming the keys are separated by commas
                 outputText.value = trans.doubleTranspositionEncrypt(inputText.value, keys[0], keys[1]);
                 break;
-            case 'DES':
+            case 'des':
                 var keyP =utils.padding(utils.str2ArrayBuffer(key.value),8);
                 keyP = keyP.slice(0, 8);
                 var encryptMsg = utils.padding(utils.str2ArrayBuffer(inputText.value), 8);
                 encryptMsg = utils.dealBufferBlock(encryptMsg,8, desEncrypt, keyP);
                 outputText.value = utils.arrayBuffer2HexString(encryptMsg);
                 break;
-            case 'AES':
+            case 'aes':
                 keyP =utils.padding(utils.str2ArrayBuffer(key.value),16);
                 keyP = keyP.slice(0, 16);
                 var encryptMsg = utils.padding(utils.str2ArrayBuffer(inputText.value), 16);
                 encryptMsg = utils.dealBufferBlock(encryptMsg,16, aesEncrypt, keyP);
                 outputText.value = utils.arrayBuffer2HexString(encryptMsg);
                 break;
-            case 'RC4':
+            case 'rc4':
                 outputText.value = utils.arrayBuffer2HexString(rc4.rc4Encrypt(utils.str2ArrayBuffer(inputText.value), key.value));
                 break;
-            case 'MD5':
-                outputText.value = utils.arrayBuffer2HexString(md5.md5Calculate(utils.str2ArrayBuffer(inputText.value)));
-                break;
+            // case 'md5':
+            //     outputText.value = utils.arrayBuffer2HexString(md5.md5Calculate(utils.str2ArrayBuffer(inputText.value)));
+            //     break;
             default:
                 outputText.value = '请选择一个加密算法';
         }
@@ -146,21 +146,21 @@ async function decrypt() {
                 const keys = key.value.split(','); // Assuming the keys are separated by commas
                 outputText.value = trans.doubleTranspositionDecrypt(inputText.value, keys[0], keys[1]);
                 break;
-            case 'DES':
+            case 'des':
                 var keyP =utils.padding(utils.str2ArrayBuffer(key.value),16);
                 keyP = keyP.slice(0, 16);
                 var decryptMsg = utils.padding(utils.hexString2U8Array(inputText.value), 8);
                 decryptMsg = utils.dealBufferBlock(decryptMsg,8, desDecrypt, keyP);
                 outputText.value = utils.arrayBuffer2Str(decryptMsg);
                 break;
-            case 'AES':
+            case 'aes':
                 keyP =utils.padding(utils.str2ArrayBuffer(key.value),32);
                 keyP = keyP.slice(0, 32);
                 var encryptMsg = utils.padding(utils.hexString2U8Array(inputText.value), 16);
                 encryptMsg = utils.dealBufferBlock(encryptMsg,16, aesDecrypt, keyP);
                 outputText.value = utils.arrayBuffer2Str(encryptMsg);
                 break;
-            case 'RC4':
+            case 'rc4':
                 outputText.value = utils.arrayBuffer2Str(rc4.rc4Encrypt(utils.hexString2U8Array(inputText.value), key.value));
                 break;
             default:
