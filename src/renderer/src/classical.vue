@@ -85,15 +85,10 @@ async function encrypt() {
                 break;
             case 'DES':
                 var keyP =utils.padding(utils.str2ArrayBuffer(key.value),8);
-                console.log(keyP);
                 keyP = keyP.slice(0, 8);
-                console.log(keyP);
                 var encryptMsg = utils.padding(utils.str2ArrayBuffer(inputText.value), 8);
-                console.log(encryptMsg);
                 encryptMsg = utils.dealBufferBlock(encryptMsg,8, desEncrypt, keyP);
-                console.log(encryptMsg);
                 outputText.value = utils.arrayBuffer2HexString(encryptMsg);
-                console.log(outputText.value);
                 break;
             case 'AES':
                 keyP =utils.padding(utils.str2ArrayBuffer(key.value),16);
