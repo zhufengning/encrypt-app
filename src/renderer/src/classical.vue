@@ -1,10 +1,15 @@
   
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import * as monoalpha from '../../cipher/classical/monoalpha.mjs';
 import * as trans from '../../cipher/classical/trans.mjs';
 import * as polyalpha from '../../cipher/classical/polyalpha.mjs';
 import * as playfair from '../../cipher/classical/pf.mjs';
+import * as rc4 from '../../cipher/stream/rc4.mjs';
+import {aesEncrypt,aesDecrypt} from '../../cipher/block/aes.mjs';
+import {desEncrypt,desDecrypt} from '../../cipher/block/des.mjs';
+import * as md5 from '../../cipher/hash/md5.mjs';
+import * as utils from '../../cipher/utils.mjs';
 
 var selectedCipherCategory = ref('');
 var cipherCategories = ref(['单表替代密码', '多表替代密码', '多图替代密码', '置换密码', '块密码', '流密码', '散列函数']);
@@ -27,9 +32,9 @@ function updateCipherOptions() {
         '多表替代密码': ['Vigenere cipher', 'Autokey ciphertext', 'Autokey plaintext'],
         '多图替代密码': ['Playfair cipher'],
         '置换密码': ['Column permutation cipher', 'Double-Transposition cipher'],
-        '块密码': ['aes', 'des'],
-        '流密码': ['rc4'],
-        '散列函数': ['md5'],
+        '块密码': ['DES', 'AES'],
+        '流密码': ['RC4'],
+        '散列函数': ['MD5'],
     };
     ciphers.value = cipherOptions[selectedCipherCategory.value] || [];
     selectedCipher.value = "";
@@ -78,6 +83,31 @@ async function encrypt() {
                 const keys = key.value.split(','); // Assuming the keys are separated by commas
                 outputText.value = trans.doubleTranspositionEncrypt(inputText.value, keys[0], keys[1]);
                 break;
+            case 'DES':
+                var keyP =utils.padding(utils.str2ArrayBuffer(key.value),8);
+                console.log(keyP);
+                keyP = keyP.slice(0, 8);
+                console.log(keyP);
+                var encryptMsg = utils.padding(utils.str2ArrayBuffer(inputText.value), 8);
+                console.log(encryptMsg);
+                encryptMsg = utils.dealBufferBlock(encryptMsg,8, desEncrypt, keyP);
+                console.log(encryptMsg);
+                outputText.value = utils.U8Array2hexString(encryptMsg);
+                console.log(outputText.value);
+                break;
+            case 'AES':
+                keyP =utils.padding(utils.str2ArrayBuffer(key.value),16);
+                keyP = keyP.slice(0, 16);
+                var encryptMsg = utils.padding(utils.str2ArrayBuffer(inputText.value), 16);
+                encryptMsg = utils.dealBufferBlock(encryptMsg,16, aesEncrypt, keyP);
+                outputText.value = utils.U8Array2hexString(encryptMsg);
+                break;
+            case 'RC4':
+                outputText.value = utils.U8Array2hexString(rc4.rc4Encrypt(utils.str2ArrayBuffer(inputText.value), key.value));
+                break;
+            case 'MD5':
+                outputText.value = utils.U8Array2hexString(md5.md5Calculate(utils.str2ArrayBuffer(inputText.value)));
+                break;
             default:
                 outputText.value = '请选择一个加密算法';
         }
@@ -120,6 +150,23 @@ async function decrypt() {
                 // For double transposition, the key is expected to be an array [key1, key2]
                 const keys = key.value.split(','); // Assuming the keys are separated by commas
                 outputText.value = trans.doubleTranspositionDecrypt(inputText.value, keys[0], keys[1]);
+                break;
+            case 'DES':
+                var keyP =utils.padding(utils.str2ArrayBuffer(key.value),16);
+                keyP = keyP.slice(0, 16);
+                var decryptMsg = utils.padding(utils.hexString2U8Array(inputText.value), 8);
+                decryptMsg = utils.dealBufferBlock(decryptMsg,8, desDecrypt, keyP);
+                outputText.value = utils.arrayBuffer2Str(decryptMsg);
+                break;
+            case 'AES':
+                keyP =utils.padding(utils.str2ArrayBuffer(key.value),32);
+                keyP = keyP.slice(0, 32);
+                var encryptMsg = utils.padding(utils.hexString2U8Array(inputText.value), 16);
+                encryptMsg = utils.dealBufferBlock(encryptMsg,16, aesDecrypt, keyP);
+                outputText.value = utils.U8Array2hexString(encryptMsg);
+                break;
+            case 'RC4':
+                outputText.value = utils.arrayBuffer2Str(rc4.rc4Encrypt(utils.hexString2U8Array(inputText.value), key.value));
                 break;
             default:
                 outputText.value = '请选择一个解密算法';

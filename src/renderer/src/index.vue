@@ -32,7 +32,7 @@ onMounted(getShi)
     <v-bottom-navigation v-model="page" active color="primary">
       <v-btn @click="jmp('/1');">
         <v-icon>mdi-history</v-icon>
-        经典密码
+        对称密码
       </v-btn>
 
       <!-- <v-btn @click="jmp('/2');">
