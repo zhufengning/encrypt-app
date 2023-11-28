@@ -7,7 +7,7 @@ import * as polyalpha from '../../cipher/classical/polyalpha.mjs';
 import * as playfair from '../../cipher/classical/pf.mjs';
 
 var selectedCipherCategory = ref('');
-var cipherCategories = ref(['单表替代密码', '多表替代密码', '多图替代密码', '置换密码', '块密码', '流密码', '散列函数']);
+var cipherCategories = ref(['单表替代密码', '多表替代密码', '多图替代密码', '置换密码', '块密码', '流密码']);
 var selectedCipher = ref('');
 var ciphers = ref([]);
 var inputText = ref('');
@@ -29,7 +29,6 @@ function updateCipherOptions() {
         '置换密码': ['Column permutation cipher', 'Double-Transposition cipher'],
         '块密码': ['aes', 'des'],
         '流密码': ['rc4'],
-        '散列函数': ['md5'],
     };
     ciphers.value = cipherOptions[selectedCipherCategory.value] || [];
     selectedCipher.value = "";
