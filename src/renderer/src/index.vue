@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import {load} from "jinrishici"
+import { load } from "jinrishici"
 
 
 var page = ref(0)
@@ -14,17 +14,17 @@ function jmp(s) {
   router.push(s);
 }
 
-var getShi=() => {
+var getShi = () => {
   load(result => {
     console.log(result);
-    shi.value = "——"+result.data.content;
+    shi.value = "——" + result.data.content;
   });
 }
 onMounted(getShi)
 </script>
 
 <template>
-  <v-layout>
+  <v-app>
 
     <v-app-bar color="teal-darken-4">
       <v-app-bar-title>{{ currentRouteName + shi }}</v-app-bar-title>
@@ -34,7 +34,7 @@ onMounted(getShi)
     <v-bottom-navigation v-model="page" active color="primary">
       <v-btn @click="jmp('/1');">
         <v-icon>mdi-debian</v-icon>
-        对称加密  
+        对称加密
       </v-btn>
 
       <v-btn @click="jmp('/7');">
@@ -67,5 +67,5 @@ onMounted(getShi)
         密钥交换
       </v-btn>
     </v-bottom-navigation>
-  </v-layout>
+  </v-app>
 </template>

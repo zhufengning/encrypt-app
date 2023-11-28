@@ -6,7 +6,7 @@ import { aesEncrypt, aesDecrypt } from "../../cipher/block/aes.mjs"
 import { desEncrypt, desDecrypt } from "../../cipher/block/des.mjs"
 import { rc4Encrypt, rc4Decrypt } from "../../cipher/stream/rc4.mjs"
 import { hexString2U8Array } from "../../cipher/utils.mjs"
-import { padding,dealBufferBlock } from '../../cipher/utils.mjs';
+import { padding, dealBufferBlock } from '../../cipher/utils.mjs';
 
 var server_port = ref("3000");
 var client_url = ref("ws://localhost:3000");
@@ -16,6 +16,7 @@ var pri_key = ref("");
 var pub_key = ref("");
 var message = ref("");
 var final_key = ref("");
+var page = ref(1);
 
 var selectedCipher = ref('None');
 var ciphers = ref(['DES', 'AES', 'RC4', 'None']);
@@ -67,12 +68,12 @@ function gotMsg(msg) {
       // // 去除多余0后,使用 slice 方法截断数组
       // decodedMsg=decodedMsg.slice(0,decodedMsg.length / 2);
 
-      decryptMsg = dealBufferBlock(decodedMsg,16, aesDecrypt, key);
+      decryptMsg = dealBufferBlock(decodedMsg, 16, aesDecrypt, key);
       decryptMsg = new TextDecoder().decode(new Uint16Array(decryptMsg));
       break;
     case "DES":
       key = key.slice(0, 16);
-      decryptMsg = dealBufferBlock(decodedMsg,8, desDecrypt, key);
+      decryptMsg = dealBufferBlock(decodedMsg, 8, desDecrypt, key);
       decryptMsg = new TextDecoder().decode(new Uint8Array(decryptMsg));
       break;
     case "RC4":
@@ -82,7 +83,7 @@ function gotMsg(msg) {
     default:
       alert("No!");
   }
-  msgs.value.push({ name: "Someone: " + decryptMsg, value: msgs.value.length });
+  msgs.value.push({ name: "Someone: ", msg: decryptMsg });
 }
 
 function connectServer() {
@@ -112,12 +113,12 @@ function sendMessage() {
       break;
     case "AES":
       encodedMsg = padding(encodedMsg, 16);
-      encryptMsg = dealBufferBlock(encodedMsg,16, aesEncrypt, key);
+      encryptMsg = dealBufferBlock(encodedMsg, 16, aesEncrypt, key);
       break;
     case "DES":
       key = key.slice(0, 16);
       encodedMsg = padding(encodedMsg, 8);
-      encryptMsg = dealBufferBlock(encodedMsg,8, desEncrypt, key);
+      encryptMsg = dealBufferBlock(encodedMsg, 8, desEncrypt, key);
       break;
     case "RC4":
       encryptMsg = rc4Encrypt(encodedMsg.buffer, key);
@@ -131,8 +132,12 @@ function sendMessage() {
   } else if (conn_type.value == "server") {
     window.api.sendMsg(encryptMsg)
   }
-  msgs.value.push({ name: "You: " + message.value, value: msgs.value.length })
+  msgs.value.push({ name: "You: ", msg: message.value })
   message.value = "";
+}
+
+function downFile(p) {
+  alert(p);
 }
 
 onMounted(async () => {
@@ -188,17 +193,32 @@ onMounted(async () => {
         <v-combobox v-model="selectedCipher" :items="ciphers" label="选择密码类别" outlined></v-combobox>
       </v-col>
     </v-row>
-    <v-row style="overflow-y: scroll; height:50vh" height="300">
+    <v-row style="overflow-y: scroll; height:50vh">
       <v-col>
-        <v-card class="mx-auto">
-          <v-list :items="msgs" item-title="name" item-subtitle="name" item-value="msg">
-          </v-list>
-        </v-card>
+        <v-data-iterator :items="msgs" :page="page" class="ga-2">
+          <template v-slot:default="{ items }">
+            <template v-for="(item, i) in   items  " :key="i">
+              <v-card>
+                <v-card-title>
+                  {{ item.raw.name }}
+                </v-card-title>
+                <v-card-text height="150" class="overflow-auto">
+                  <v-textarea :model-value="item.raw.msg"></v-textarea>
+                </v-card-text>
+                <v-card-actions v-if="item.raw.msg.startsWith('file:')">
+                  <v-btn @click="downFile(item.raw.msg)">
+                    下载
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+          </template>
+        </v-data-iterator>
       </v-col>
     </v-row>
     <v-row v-if="final_key">
-      <v-text-field v-model="message" append-icon="mdi-send" label="Message" type="text"
-        @click:append="sendMessage"></v-text-field>
+      <v-textarea v-model="message" append-icon="mdi-send" label="Message" type="text"
+        @click:append="sendMessage"></v-textarea>
     </v-row>
   </v-container>
 </template>
