@@ -8,7 +8,6 @@ import * as playfair from '../../cipher/classical/pf.mjs';
 import * as rc4 from '../../cipher/stream/rc4.mjs';
 import {aesEncrypt,aesDecrypt} from '../../cipher/block/aes.mjs';
 import {desEncrypt,desDecrypt} from '../../cipher/block/des.mjs';
-import * as md5 from '../../cipher/hash/md5.mjs';
 import * as utils from '../../cipher/utils.mjs';
 
 var selectedCipherCategory = ref('');

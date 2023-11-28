@@ -1,23 +1,16 @@
   
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import * as md5 from '../../cipher/hash/md5.mjs';
-
+import * as utils from '../../cipher/utils.mjs';
 
 var selectedCipherCategory = ref('');
 var cipherCategories = ref(['散列函数']);
 var selectedCipher = ref('');
 var ciphers = ref([]);
 var inputText = ref('');
-var key = ref('');
-var key2 = ref('');
 var outputText = ref('');
 var isEncrypt = ref(true);
-
-function needsKey() {
-
-    return selectedCipher.value != 'md5';
-}
 
 function updateCipherOptions() {
     const cipherOptions = {
@@ -31,45 +24,23 @@ function updateCipherOptions() {
 function operate() {
     if (isEncrypt.value) {
         encrypt();
-    } else {
-        decrypt();
     }
 }
+
 async function encrypt() {
     try {
         switch (selectedCipher.value) {
             case 'md5':
-                outputText.value = md5.md5Calculate(inputText.value);
+                outputText.value = utils.arrayBuffer2HexString(md5.md5Calculate(utils.str2ArrayBuffer(inputText.value)));
                 break;
             default:
-                outputText.value = '请选择一个加密算法';
+                outputText.value = '请选择一个哈希摘要算法';
         }
     } catch (error) {
         outputText.value = '加密过程中出现错误: ' + error.message;
     }
 
 }
-// async function decrypt() {
-//     try {
-//         switch (selectedCipher.value) {
-//             case 'md5':
-//                 outputText.value = md5.caesarEncrypt(inputText.value, key.value);
-//                 break;
-//             default:
-//                 outputText.value = '请选择一个解密算法';
-//         }
-//     } catch (error) {
-//         outputText.value = '解密过程中出现错误: ' + error.message;
-//     }
-// }
-
-// watch: {
-//     selectedCipherCategory(newVal, oldVal) {
-//         if (newVal !== oldVal) {
-//             updateCipherOptions.value();
-//         }
-//     }
-// }
 </script>
   
 <template>
@@ -96,27 +67,9 @@ async function encrypt() {
             </v-col>
         </v-row>
 
-        <!-- 密钥输入 -->
-        <!-- <v-row v-if="needsKey()">
-                <v-col cols="12">
-                    <v-text-field v-model="key" label="密钥1" hint="请输入密钥" persistent-hint outlined></v-text-field>
-                
-                    <v-text-field v-if="selectedCipher === 'Double-Transposition cipher'" v-model="key2" label="密钥2"
-                        hint="请输入第二密钥" persistent-hint outlined></v-text-field>
-                </v-col>
-            </v-row> -->
-
-        <!-- 操作类型选择 -->
-        <!-- <v-row v-if="needsKey()">
-            <v-col cols="12" sm="6">
-                <v-switch color="primary" v-model="isEncrypt" :label="`操作类型： ${isEncrypt ? '加密' : '解密'}`"></v-switch>
-            </v-col>
-        </v-row> -->
-
-        <!-- 操作按钮 -->
         <v-row>
             <v-col>
-                <v-btn color="black" @click="operate">加密</v-btn>
+                <v-btn color="black" @click="operate">计算</v-btn>
             </v-col>
         </v-row>
     </v-container>

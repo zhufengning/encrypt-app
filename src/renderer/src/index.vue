@@ -39,7 +39,7 @@ onMounted(getShi)
 
       <v-btn @click="jmp('/7');">
         <v-icon>mdi-ubuntu</v-icon>
-        md5
+        Hash
       </v-btn>
 
       <v-btn @click="jmp('/3');">
