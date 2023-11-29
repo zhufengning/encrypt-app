@@ -6,6 +6,7 @@ import * as polyalpha from '../../cipher/classical/polyalpha.mjs';
 import * as playfair from '../../cipher/classical/pf.mjs';
 import * as rc4 from '../../cipher/stream/rc4.mjs';
 import * as ca from '../../cipher/stream/ca.mjs';
+import * as salsa20 from '../../cipher/stream/salsa20.mjs';
 import { aesEncrypt, aesDecrypt } from '../../cipher/block/aes.mjs';
 import { desEncrypt, desDecrypt } from '../../cipher/block/des.mjs';
 import * as utils from '../../cipher/utils.mjs';
@@ -37,7 +38,7 @@ function updateCipherOptions() {
         '多图替代密码': ['Playfair cipher'],
         '置换密码': ['Column permutation cipher', 'Double-Transposition cipher'],
         '块密码': ['aes', 'des'],
-        '流密码': ['rc4', 'ca'],
+        '流密码': ['rc4', 'ca', 'salsa20'],
     };
     ciphers.value = cipherOptions[selectedCipherCategory.value] || [];
     selectedCipher.value = "";
@@ -109,6 +110,10 @@ async function encrypt() {
             case 'ca':
                 outputText.value = ca.caEncrypt(cavalue.value, Number(carule.value), Number(casource.value), inputText.value);
                 break;
+            case 'salsa20':
+                const salsaInstance = new salsa20.JSSalsa20(utils.hexString2U8Array(key.value), utils.hexString2U8Array(nonce.value));
+                outputText.value = utils.arrayBuffer2HexString(salsaInstance.encrypt(utils.hexString2U8Array(inputText.value)));
+                break;
             default:
                 outputText.value = '请选择一个加密算法';
         }
@@ -173,6 +178,10 @@ async function decrypt() {
                 const keyStream = ca.generateKeyStream(ca.stringToInts(cavalue.value), Number(carule.value), Number(casource.value), inputText.value.length);
                 outputText.value = ca.caDecrypt(inputText.value, ca.intsToString(keyStream));
                 break;
+            case 'salsa20':
+                const salsaInstance = new salsa20.JSSalsa20(utils.hexString2U8Array(key.value), utils.hexString2U8Array(nonce.value));
+                outputText.value = utils.arrayBuffer2HexString(salsaInstance.encrypt(utils.hexString2U8Array(inputText.value)));
+                break;
             default:
                 outputText.value = '请选择一个解密算法';
         }
@@ -210,8 +219,8 @@ async function decrypt() {
         <!-- 密钥输入 -->
         <v-row>
             <v-col cols="12">
-                <v-text-field v-if="selectedCipher !== 'ca'" v-model="key" label="密钥1" hint="请输入密钥" persistent-hint
-                    outlined></v-text-field>
+                <v-text-field v-if="selectedCipher !== 'ca' && selectedCipher !== 'salsa20'" v-model="key" label="密钥1"
+                    hint="请输入密钥" persistent-hint outlined></v-text-field>
 
                 <!-- 如果是双重置换密码，显示第二个密钥输入框 -->
                 <v-text-field v-if="selectedCipher === 'Double-Transposition cipher'" v-model="key2" label="密钥2"
@@ -224,6 +233,12 @@ async function decrypt() {
                     outlined></v-text-field>
                 <v-text-field v-if="selectedCipher === 'ca'" v-model="casource" label="源位置" hint="请输入CA源位置（整数）"
                     persistent-hint outlined></v-text-field>
+                <!-- salsa20算法的特定输入 -->
+                <v-text-field v-if="selectedCipher === 'salsa20'" v-model="key" label="密钥" hint="请输入32字节的密钥" persistent-hint
+                    outlined></v-text-field>
+                <v-text-field v-if="selectedCipher === 'salsa20'" v-model="nonce" label="随机数" hint="请输入8字节的随机数"
+                    persistent-hint outlined></v-text-field>
+
             </v-col>
         </v-row>
 
@@ -234,7 +249,7 @@ async function decrypt() {
             </v-col>
         </v-row>
 
-        
+
         <!-- 操作按钮 -->
         <v-row>
             <v-col>
