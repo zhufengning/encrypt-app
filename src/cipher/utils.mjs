@@ -291,3 +291,18 @@ export function padding(data, size) {
     return data;
   }
 }
+
+// 这个函数将一个十六进制字符串转换为一个ArrayBuffer
+export function hexStringToArrayBuffer(hexString) {
+  if (hexString.length !== 64) {
+    throw new Error('十六进制字符串长度必须为 64，对应 32 字节');
+  }
+  var buffer = new ArrayBuffer(32);
+  var dataView = new DataView(buffer);
+  for (var i = 0; i < 32; i++) {
+    var byte = parseInt(hexString.substring(i * 2, i * 2 + 2), 16);
+    dataView.setUint8(i, byte);
+  }
+  return buffer;
+}
+
