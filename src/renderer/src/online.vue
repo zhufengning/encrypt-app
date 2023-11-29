@@ -5,8 +5,7 @@ import init, { pri_keygen, final_keygen, pub_keygen } from "my-ecdh"
 import { aesEncrypt, aesDecrypt } from "../../cipher/block/aes.mjs"
 import { desEncrypt, desDecrypt } from "../../cipher/block/des.mjs"
 import { rc4Encrypt, rc4Decrypt } from "../../cipher/stream/rc4.mjs"
-import { hexString2U8Array } from "../../cipher/utils.mjs"
-import { padding,dealBufferBlock } from '../../cipher/utils.mjs';
+import { padding, dealBufferBlock, str2ArrayBuffer,arrayBuffer2HexString,hexString2U8Array } from '../../cipher/utils.mjs';
 
 var server_port = ref("3000");
 var client_url = ref("ws://localhost:3000");
@@ -16,6 +15,9 @@ var pri_key = ref("");
 var pub_key = ref("");
 var message = ref("");
 var final_key = ref("");
+var page = ref(1);
+var chosen_file = ref();
+
 
 var selectedCipher = ref('None');
 var ciphers = ref(['DES', 'AES', 'RC4', 'None']);
@@ -66,13 +68,14 @@ function gotMsg(msg) {
 
       // // 去除多余0后,使用 slice 方法截断数组
       // decodedMsg=decodedMsg.slice(0,decodedMsg.length / 2);
-
-      decryptMsg = dealBufferBlock(decodedMsg,16, aesDecrypt, key);
+      console.log(decodedMsg.byteLength);
+      decryptMsg = dealBufferBlock(decodedMsg, 16, aesDecrypt, key);
       decryptMsg = new TextDecoder().decode(new Uint16Array(decryptMsg));
       break;
     case "DES":
       key = key.slice(0, 16);
-      decryptMsg = dealBufferBlock(decodedMsg,8, desDecrypt, key);
+      console.log(decodedMsg.byteLength);
+      decryptMsg = dealBufferBlock(decodedMsg, 8, desDecrypt, key);
       decryptMsg = new TextDecoder().decode(new Uint8Array(decryptMsg));
       break;
     case "RC4":
@@ -82,7 +85,7 @@ function gotMsg(msg) {
     default:
       alert("No!");
   }
-  msgs.value.push({ name: "Someone: " + decryptMsg, value: msgs.value.length });
+  msgs.value.push({ name: "Someone: ", msg: decryptMsg });
 }
 
 function connectServer() {
@@ -104,7 +107,9 @@ function connectServer() {
 function sendMessage() {
   var encryptMsg;
   var key = hexString2U8Array(final_key.value).buffer;
-  var encodedMsg = new TextEncoder().encode(message.value);
+  var encodedMsg;
+  encodedMsg = str2ArrayBuffer(message.value);
+
   console.log(key, "\n", encodedMsg);
   switch (selectedCipher.value) {
     case "None":
@@ -112,16 +117,18 @@ function sendMessage() {
       break;
     case "AES":
       encodedMsg = padding(encodedMsg, 16);
-      encryptMsg = dealBufferBlock(encodedMsg,16, aesEncrypt, key);
+      console.log(encodedMsg.byteLength);
+      encryptMsg = dealBufferBlock(encodedMsg, 16, aesEncrypt, key);
       break;
     case "DES":
       key = key.slice(0, 16);
       encodedMsg = padding(encodedMsg, 8);
-      encryptMsg = dealBufferBlock(encodedMsg,8, desEncrypt, key);
+      console.log(encodedMsg.byteLength);
+      encryptMsg = dealBufferBlock(encodedMsg, 8, desEncrypt, key);
       break;
     case "RC4":
-      encryptMsg = rc4Encrypt(encodedMsg.buffer, key);
-      console.log(encodedMsg.buffer, key, encryptMsg)
+      encryptMsg = rc4Encrypt(encodedMsg, key);
+      console.log(encodedMsg, key, encryptMsg);
       break;
     default:
       alert("No!");
@@ -131,8 +138,32 @@ function sendMessage() {
   } else if (conn_type.value == "server") {
     window.api.sendMsg(encryptMsg)
   }
-  msgs.value.push({ name: "You: " + message.value, value: msgs.value.length })
+  msgs.value.push({ name: "You: ", msg: message.value })
   message.value = "";
+}
+
+function downFile(data) {
+  console.log(data);
+  var dataArray=hexString2U8Array(data.slice(5, data.byteLength));
+  console.log(dataArray);
+  const blob = new Blob([(dataArray.buffer)]);
+
+  // 创建一个文件保存对话框
+  const a = document.createElement('a');
+  a.href = window.URL.createObjectURL(blob);
+
+  // 设置默认的下载文件名，如果没有提供自定义文件名
+  a.download = 'download';
+
+  // 将链接元素添加到文档中
+  document.body.appendChild(a);
+
+  a.click();
+
+  // 移除链接元素
+  document.body.removeChild(a);
+
+  window.URL.revokeObjectURL(a.href);
 }
 
 onMounted(async () => {
@@ -142,6 +173,18 @@ onMounted(async () => {
   keygen();
 })
 
+
+function file_change() {
+  let reader = new FileReader();
+
+  reader.readAsArrayBuffer(chosen_file.value[0]);
+  reader.onload = () => {
+    var head = "file:";
+    var data = arrayBuffer2HexString(reader.result);
+    console.log(data);
+    message.value = head+data;
+  }
+}
 </script>
 
 <template>
@@ -169,36 +212,56 @@ onMounted(async () => {
       </v-row>
     </div>
     <v-row>
-      ecdh私钥：{{ pri_key }}
+      ecdh私钥:{{ pri_key }}
     </v-row>
     <v-row>
-      ecdh公钥：{{ pub_key }}
+      ecdh公钥:{{ pub_key }}
     </v-row>
     <v-row>
-      已交换密钥：{{ final_key }}
+      已交换密钥:{{ final_key }}
     </v-row>
     <v-row v-if="conn_type == 'server'">
-      服务器模式，端口：{{ server_port }}
+      服务器模式，端口:{{ server_port }}
     </v-row>
     <v-row v-if="conn_type == 'client'">
-      客户端模式，服务器：{{ client_url }}
+      客户端模式，服务器:{{ client_url }}
     </v-row>
     <v-row>
       <v-col>
         <v-combobox v-model="selectedCipher" :items="ciphers" label="选择密码类别" outlined></v-combobox>
       </v-col>
     </v-row>
-    <v-row style="overflow-y: scroll; height:50vh" height="300">
+    <v-row style="overflow-y: scroll; height:50vh">
       <v-col>
-        <v-card class="mx-auto">
-          <v-list :items="msgs" item-title="name" item-subtitle="name" item-value="msg">
-          </v-list>
-        </v-card>
+        <v-data-iterator :items="msgs" :page="page" class="ga-2">
+          <template v-slot:default="{ items }">
+            <template v-for="(item, i) in   items  " :key="i">
+              <v-card>
+                <v-card-title>
+                  {{ item.raw.name }}
+                </v-card-title>
+                <v-card-text height="150" class="overflow-auto">
+                  <v-textarea :model-value="item.raw.msg"></v-textarea>
+                </v-card-text>
+                <v-card-actions v-if="typeof item.raw.msg === 'string' && item.raw.msg.startsWith('file:')">
+                  <v-btn @click="downFile(item.raw.msg)">
+                    下载
+                  </v-btn>
+                </v-card-actions>
+
+              </v-card>
+            </template>
+          </template>
+        </v-data-iterator>
       </v-col>
     </v-row>
+    <v-row>
+      <v-file-input label="导入文件" prepend-icon="mdi-import" v-model="chosen_file" @change="file_change" chips accept="*">
+      </v-file-input>
+    </v-row>
     <v-row v-if="final_key">
-      <v-text-field v-model="message" append-icon="mdi-send" label="Message" type="text"
-        @click:append="sendMessage"></v-text-field>
+      <v-textarea v-model="message" append-icon="mdi-send" label="Message" type="text"
+        @click:append="sendMessage"></v-textarea>
     </v-row>
   </v-container>
 </template>

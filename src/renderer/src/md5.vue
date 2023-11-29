@@ -33,14 +33,17 @@ function operate() {
 
 async function hashC() {
     try {
+        var temp;
+        if (chosen_file.value[0]) {
+            temp = new Uint8Array(inputText.value);
+        }
+        else {
+            temp = utils.str2ArrayBuffer(inputText.value);
+        }
         switch (selectedCipher.value) {
             case 'md5':
-                if (chosen_file.value[0]) {
-                    outputText.value = utils.arrayBuffer2HexString(md5.md5Calculate(new Uint8Array(inputText.value)));
-                }
-                else {
-                    outputText.value = utils.arrayBuffer2HexString(md5.md5Calculate(utils.str2ArrayBuffer(inputText.value)));
-                }
+
+                outputText.value = utils.arrayBuffer2HexString(md5.md5Calculate(temp));
                 break;
             default:
                 outputText.value = '请选择一个哈希摘要算法';
@@ -54,7 +57,7 @@ async function hashC() {
 function file_change() {
     let reader = new FileReader();
 
-    reader.readAsText(chosen_file.value[0]);
+    reader.readAsArrayBuffer(chosen_file.value[0]);
     reader.onload = () => {
         inputText.value = reader.result;
     }
