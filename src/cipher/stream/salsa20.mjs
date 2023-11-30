@@ -202,12 +202,8 @@ export class JSSalsa20 {
 }
 
 
-
-
-
-
-
 // EXPORT //
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = JSSalsa20
 }
+
