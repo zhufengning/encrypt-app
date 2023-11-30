@@ -144,8 +144,10 @@ function sendMessage() {
 
 function downFile(data) {
   console.log(data);
+  data=data.replaceAll(" ","");//去填充字符
   var dataArray=hexString2U8Array(data.slice(5, data.byteLength));
-  console.log(dataArray);
+  
+
   const blob = new Blob([(dataArray.buffer)]);
 
   // 创建一个文件保存对话框
