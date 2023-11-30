@@ -1,5 +1,7 @@
 mod utils;
 
+use std::fmt::format;
+
 use ibig::{modular::ModuloRing, ubig, UBig};
 use lazy_static::lazy_static;
 use rand::{thread_rng, Rng};
@@ -35,7 +37,7 @@ pub fn rsa_keygen(nbit: usize) -> String {
         q = get_random_prime(prime_len);
         n = &p * &q;
     }
-
+    log(&format!("p={},q={}", p.to_string(), q.to_string()));
     let phi: UBig = (&p - 1) * (&q - 1);
     let mut e = thread_rng().gen_range(ubig!(2)..phi.clone());
     while e.gcd(&phi) != ubig!(1) {

@@ -123,8 +123,8 @@ onMounted(async () => await init())
             <v-file-input label="导入文件" prepend-icon="mdi-import" v-model="chosen_file" @change="file_change" chips
               accept="*">
             </v-file-input>
-            <v-textarea v-model="content"></v-textarea>
-            <v-textarea v-model="output"></v-textarea>
+            <v-textarea label="输入" v-model="content"></v-textarea>
+            <v-textarea label="输出" v-model="output"></v-textarea>
           </v-card-text>
           <v-card-actions>
             <v-btn @click="on_rsa_encrypt_click(false);">加/解密</v-btn>
