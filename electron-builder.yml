@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: fun.zhufn.encrypt-app
 productName: encrypt-app
 directories:
   buildResources: build
