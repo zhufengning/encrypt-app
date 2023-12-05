@@ -1,9 +1,9 @@
 {
   "name": "encrypt-app",
   "version": "1.0.0",
-  "description": "An Electron application with Vue",
+  "description": "encrypt-app",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "zhufn.fun",
   "homepage": "https://www.electronjs.org",
   "scripts": {
     "format": "prettier --write .",
