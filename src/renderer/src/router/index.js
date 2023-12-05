@@ -12,7 +12,7 @@ import md5 from '../md5.vue'
 
 
 const routes = [
-  { path: '/1', component: classical, name: "经典密码" },
+  { path: '/1', component: classical, name: "对称密码" },
   { path: '/2', component: rsa, name: "rsa" },
   { path: '/4', component: ecc, name: "ecc(Curve25519)" },
   { path: '/ecdh', component: ecdh, name: "椭圆曲线DH密钥交换" },
