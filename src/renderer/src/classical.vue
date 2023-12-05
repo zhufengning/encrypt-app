@@ -106,7 +106,6 @@ async function encrypt() {
       case 'rc4':
         outputText.value = utils.arrayBuffer2HexString(rc4.rc4Encrypt(utils.str2ArrayBuffer(inputText.value), key.value));
         break;
-        的加密逻辑
       case 'ca':
         outputText.value = ca.caEncrypt(cavalue.value, Number(carule.value), Number(casource.value), inputText.value);
         break;
