@@ -55,70 +55,71 @@ function operate() {
 
 
 async function encrypt() {
-  try {
-    switch (selectedCipher.value) {
-      case 'Caesar cipher':
-        outputText.value = monoalpha.caesarEncrypt(inputText.value, key.value);
-        break;
-      case 'Keyword cipher':
-        outputText.value = monoalpha.keywordEncrypt(inputText.value, key.value);
-        break;
-      case 'Affine cipher':
-        outputText.value = monoalpha.affineEncrypt(inputText.value, key.value);
-        break;
-      // case 'Multiliteral cipher':
-      //     outputText.value = monoalpha.multiliteralEncrypt(inputText.value, key.value);
-      //     break;
-      case 'Vigenere cipher':
-        outputText.value = polyalpha.vigenereEncrypt(inputText.value, key.value);
-        break;
-      case 'Autokey ciphertext':
-        outputText.value = polyalpha.autokeyCiphertextEncrypt(inputText.value, key.value);
-        break;
-      case 'Autokey plaintext':
-        outputText.value = polyalpha.autokeyPlaintextEncrypt(inputText.value, key.value);
-        break;
-      case 'Playfair cipher':
-        outputText.value = playfair.playfairEncrypt(inputText.value, key.value);
-        break;
-      case 'Column permutation cipher':
-        outputText.value = trans.columnarTransEncrypt(inputText.value, key.value);
-        break;
-      case 'Double-Transposition cipher':
-        // For double transposition, the key is expected to be an array [key1, key2]
-        const keys = key.value.split(','); // Assuming the keys are separated by commas
-        outputText.value = trans.doubleTranspositionEncrypt(inputText.value, keys[0], keys[1]);
-        break;
-      case 'des':
-        var keyP = utils.padding(utils.str2ArrayBuffer(key.value), 8);
-        keyP = keyP.slice(0, 8);
-        var encryptMsg = utils.padding(utils.str2ArrayBuffer(inputText.value), 8);
-        encryptMsg = utils.dealBufferBlock(encryptMsg, 8, desEncrypt, keyP);
-        outputText.value = utils.arrayBuffer2HexString(encryptMsg);
-        break;
-      case 'aes':
-        keyP = utils.padding(utils.str2ArrayBuffer(key.value), 16);
-        keyP = keyP.slice(0, 16);
-        var encryptMsg = utils.padding(utils.str2ArrayBuffer(inputText.value), 16);
-        encryptMsg = utils.dealBufferBlock(encryptMsg, 16, aesEncrypt, keyP);
-        outputText.value = utils.arrayBuffer2HexString(encryptMsg);
-        break;
-      case 'rc4':
-        outputText.value = utils.arrayBuffer2HexString(rc4.rc4Encrypt(utils.str2ArrayBuffer(inputText.value), key.value));
-        break;
-      case 'ca':
-        outputText.value = ca.caEncrypt(cavalue.value, Number(carule.value), Number(casource.value), inputText.value);
-        break;
-      case 'salsa20':
-        const salsaInstance = new salsa20.JSSalsa20(utils.hexString2U8Array(key.value), utils.hexString2U8Array(nonce.value));
-        outputText.value = utils.arrayBuffer2HexString(salsaInstance.encrypt(utils.hexString2U8Array(inputText.value)));
-        break;
-      default:
-        outputText.value = '请选择一个加密算法';
+    try {
+        switch (selectedCipher.value) {
+            case 'Caesar cipher':
+                outputText.value = monoalpha.caesarEncrypt(inputText.value, key.value);
+                break;
+            case 'Keyword cipher':
+                outputText.value = monoalpha.keywordEncrypt(inputText.value, key.value);
+                break;
+            case 'Affine cipher':
+                outputText.value = monoalpha.affineEncrypt(inputText.value, key.value);
+                break;
+            case 'Multiliteral cipher':
+                outputText.value = monoalpha.multiliteralEncrypt(inputText.value, key.value);
+                break;
+            case 'Vigenere cipher':
+                outputText.value = polyalpha.vigenereEncrypt(inputText.value, key.value);
+                break;
+            case 'Autokey ciphertext':
+                outputText.value = polyalpha.autokeyCiphertextEncrypt(inputText.value, key.value);
+                break;
+            case 'Autokey plaintext':
+                outputText.value = polyalpha.autokeyPlaintextEncrypt(inputText.value, key.value);
+                break;
+            case 'Playfair cipher':
+                outputText.value = playfair.playfairEncrypt(inputText.value, key.value);
+                break;
+            case 'Column permutation cipher':
+                outputText.value = trans.columnarTransEncrypt(inputText.value, key.value);
+                break;
+            case 'Double-Transposition cipher':
+                // For double transposition, the key is expected to be an array [key1, key2]
+                const keys = key.value.split(','); // Assuming the keys are separated by commas
+                outputText.value = trans.doubleTranspositionEncrypt(inputText.value, keys[0], keys[1]);
+                break;
+            case 'des':
+                var keyP = utils.padding(utils.str2ArrayBuffer(key.value), 8);
+                keyP = keyP.slice(0, 8);
+                var encryptMsg = utils.padding(utils.str2ArrayBuffer(inputText.value), 8);
+                encryptMsg = utils.dealBufferBlock(encryptMsg, 8, desEncrypt, keyP);
+                outputText.value = utils.arrayBuffer2HexString(encryptMsg);
+                break;
+            case 'aes':
+                keyP = utils.padding(utils.str2ArrayBuffer(key.value), 16);
+                keyP = keyP.slice(0, 16);
+                var encryptMsg = utils.padding(utils.str2ArrayBuffer(inputText.value), 16);
+                encryptMsg = utils.dealBufferBlock(encryptMsg, 16, aesEncrypt, keyP);
+                outputText.value = utils.arrayBuffer2HexString(encryptMsg);
+                break;
+            case 'rc4':
+                outputText.value = utils.arrayBuffer2HexString(rc4.rc4Encrypt(utils.str2ArrayBuffer(inputText.value), key.value));
+                break;
+                的加密逻辑
+            case 'ca':
+                outputText.value = ca.caEncrypt(cavalue.value, Number(carule.value), Number(casource.value), inputText.value);
+                break;
+            case 'salsa20':
+                const salsaInstance = new salsa20.JSSalsa20(utils.hexString2U8Array(key.value), utils.hexString2U8Array(nonce.value));
+                outputText.value = utils.arrayBuffer2HexString(salsaInstance.encrypt(utils.hexString2U8Array(inputText.value)));
+                break;
+            default:
+                outputText.value = '请选择一个加密算法';
+        }
+    } catch (error) {
+        outputText.value = '加密过程中出现错误: ' + error.message;
     }
-  } catch (error) {
-    outputText.value = '加密过程中出现错误: ' + error.message;
-  }
 
 }
 async function decrypt() {
