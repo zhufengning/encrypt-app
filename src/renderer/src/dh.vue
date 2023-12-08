@@ -19,7 +19,7 @@ function update_pub_key() {
 
 function on_fin_keygen_click() {
   //console.log(dh_pri_key.value, dh_pub_key.value);
-  dh_fin_key.value = dh_fin_keygen(dh_pri_key.value, dh_pub_key.value);
+  dh_fin_key.value = dh_fin_keygen(dh_pri_key.value, dh_pub_key.value).padStart(512, '0');
 }
 
 onMounted(async () => await init())
